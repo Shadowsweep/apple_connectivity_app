@@ -28,10 +28,16 @@
 - [x] Path traversal security containment
 - [x] Full API test suite (37 total tests passed)
 
-## Phase 4: React + Vite Frontend
-- [ ] Netflix-style dark mode theme (from `DESIGN.md`)
-- [ ] High-performance virtualized media grid (100k+ items)
-- [ ] Interactive filter panel, import preview modal, album manager
+## Phase 4: React Desktop UI (Completed)
+- [x] Netflix-style dark mode theme (`#090A0F` canvas from `DESIGN.md`)
+- [x] Responsive performant media grid with filter toolbar & date sorting
+- [x] High-res photo viewer with EXIF metadata sidebar (dimensions, hash, capture date, storage path)
+- [x] HTML5 Video Player with RFC 7233 Range streaming & watch progress auto-sync
+- [x] Interactive import wizard (device selector, filter criteria, preview with 10 GB reserve check, live progress job tracker)
+- [x] Clean Mobile workflow (verified safe deletion review screen)
+- [x] Virtual album manager (create album, add/remove media, album detail view)
+- [x] Starred favorites & soft-deleted trash management
+- [x] Library settings, incremental index & rebuild triggers, service health diagnostics
 
 ## Phase 5: Tauri Desktop Shell
 - [ ] Tauri v2 Rust wrapper for Windows 10/11
