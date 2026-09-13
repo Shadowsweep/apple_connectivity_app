@@ -74,6 +74,9 @@ class ImportRepository:
         row = cursor.fetchone()
         return ImportRecord(**dict(row)) if row else None
 
+    get_by_id = get_import_by_id
+    get_import = get_import_by_id
+
     def get_recent_imports(self, limit: int = 10) -> List[ImportRecord]:
         conn = self.db.get_connection()
         cursor = conn.cursor()

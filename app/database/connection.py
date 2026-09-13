@@ -5,7 +5,7 @@ import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional, Tuple
 
 from app.database.migrations.runner import MigrationRunner
 
@@ -90,6 +90,45 @@ class DatabaseConnection:
             dst_conn.close()
 
         return backup_path
+
+    def check_integrity(self) -> Tuple[bool, List[str]]:
+        """Runs SQLite integrity checks and returns (is_healthy, messages)."""
+        if not self.db_path.exists():
+            return True, ["Database file does not exist yet."]
+
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("PRAGMA quick_check;")
+            rows = cursor.fetchall()
+            messages = [r[0] for r in rows if r]
+            is_healthy = messages == ["ok"]
+            if not is_healthy:
+                cursor.execute("PRAGMA integrity_check;")
+                full_rows = cursor.fetchall()
+                messages = [r[0] for r in full_rows if r]
+                is_healthy = messages == ["ok"]
+            return is_healthy, messages
+        except Exception as e:
+            return False, [f"Integrity check failed with error: {str(e)}"]
+
+    def restore(self, backup_path: Path) -> bool:
+        """Safely restores SQLite database from backup file."""
+        backup_path = Path(backup_path).resolve()
+        if not backup_path.exists():
+            raise FileNotFoundError(f"Backup file not found: {backup_path}")
+
+        self.close()
+        # Restore via online backup API from backup into main db
+        dst_conn = sqlite3.connect(str(self.db_path))
+        src_conn = sqlite3.connect(str(backup_path))
+        try:
+            with dst_conn:
+                src_conn.backup(dst_conn)
+            return True
+        finally:
+            src_conn.close()
+            dst_conn.close()
 
     def close(self):
         conn = getattr(self._local, "connection", None)

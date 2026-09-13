@@ -1,13 +1,15 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.dependencies import init_app_context
+from app.api.dependencies import get_app_context, init_app_context
 from app.api.routes import (
     albums,
     analytics,
     clean,
+    diagnostics,
     duplicates,
     favorites,
     health,
@@ -21,6 +23,20 @@ from app.api.routes import (
 )
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Already handled in init_app_context
+    yield
+    # Graceful Shutdown
+    try:
+        ctx = get_app_context()
+        if ctx:
+            ctx.job_manager.shutdown()
+            ctx.db.close()
+    except Exception:
+        pass
+
+
 def create_app(
     library_root: Optional[Path] = None,
     safety_reserve_bytes: Optional[int] = None,
@@ -31,9 +47,10 @@ def create_app(
     app = FastAPI(
         title="MEMEASY Media Platform API",
         description="Localhost-first media engine and index service for MEMEASY",
-        version="0.1.0",
+        version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     # CORS configuration for local React / Tauri desktop clients
@@ -55,6 +72,7 @@ def create_app(
 
     # Register routers under /api namespace
     app.include_router(health.router, prefix="/api")
+    app.include_router(diagnostics.router, prefix="/api")
     app.include_router(libraries.router, prefix="/api")
     app.include_router(media.router, prefix="/api")
     app.include_router(clean.router, prefix="/api")

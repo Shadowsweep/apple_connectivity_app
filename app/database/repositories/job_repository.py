@@ -56,3 +56,10 @@ class JobRepository:
 
     # Alias for uniform interface
     get_by_id = get_job_by_id
+    get_job = get_job_by_id
+
+    def list_active_jobs(self) -> list[JobRecord]:
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM jobs WHERE status IN ('QUEUED', 'RUNNING')")
+        return [JobRecord(**dict(row)) for row in cursor.fetchall()]

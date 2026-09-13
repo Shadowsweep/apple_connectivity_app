@@ -23,11 +23,18 @@ from app.organizer.organizer import MediaOrganizer
 from app.storage.manager import StorageManager
 
 
+from app.core.logging import setup_logging
+from app.jobs.locks import OperationLockManager
+
+
 class AppContext:
     """Dependency container holding configured singletons for the API process."""
 
     def __init__(self, library_root: Path, safety_reserve_bytes: Optional[int] = None):
         self.library_root = Path(library_root).resolve()
+        log_dir = self.library_root / ".memeasy" / "logs"
+        self.logger = setup_logging(log_dir=log_dir)
+
         if safety_reserve_bytes is not None:
             self.storage_manager = StorageManager(
                 self.library_root, safety_reserve_bytes=safety_reserve_bytes
@@ -37,6 +44,8 @@ class AppContext:
 
         self.db = DatabaseConnection(self.library_root / ".memeasy" / "library.db")
         self.db.initialize()
+
+        self.lock_manager = OperationLockManager()
 
         self.media_repo = MediaRepository(self.db)
         self.saved_search_repo = SavedSearchRepository(self.db)
@@ -57,6 +66,10 @@ class AppContext:
         self.indexer = LibraryIndexer(self.storage_manager, self.db)
         self.thumbnails = ThumbnailService(self.storage_manager)
         self.job_manager = JobManager(self.job_repo)
+
+        # Production Startup Recoveries
+        self.job_manager.recover_stale_jobs()
+        self.importer.recover_interrupted_imports()
 
         self.cleaner_engine = CleanMobileEngine(
             library_root=self.library_root,

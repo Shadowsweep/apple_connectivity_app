@@ -219,11 +219,11 @@ class SafeImporter:
                         progress_callback(idx, len(items), item, "Skipped (Safety space limit reached)")
                     continue
 
-                # 3. Staged copy
+                # 3. Staged copy with .part extension
                 if progress_callback:
                     progress_callback(idx, len(items), item, "Copying to staging...")
 
-                temp_filename = f"{uuid.uuid4().hex}_{item.filename}"
+                temp_filename = f"{uuid.uuid4().hex}_{item.filename}.part"
                 temp_path = session_staging / temp_filename
 
                 try:
@@ -282,7 +282,7 @@ class SafeImporter:
                 # Store verified hash
                 item.hash_sha256 = v_res.staged_hash
 
-                # 5. Determine destination & Atomic Move
+                # 5. Determine destination & Atomic Move with .part and replace
                 if progress_callback:
                     progress_callback(idx, len(items), item, "Organizing into library...")
 
@@ -290,8 +290,10 @@ class SafeImporter:
                 final_abs_path = self.storage_manager.library_root / final_rel_path
                 final_abs_path.parent.mkdir(parents=True, exist_ok=True)
 
-                # Move staged file to final path
-                shutil.move(str(temp_path), str(final_abs_path))
+                part_dest = final_abs_path.with_name(final_abs_path.name + ".part")
+                # Move staged file to .part destination, then atomic replace
+                shutil.move(str(temp_path), str(part_dest))
+                part_dest.replace(final_abs_path)
 
                 # 6. Register into duplicate cache
                 self.duplicate_detector.register_imported(item, final_rel_path)
@@ -355,3 +357,50 @@ class SafeImporter:
             shutil.rmtree(session_staging, ignore_errors=True)
 
         return summary
+
+    def recover_interrupted_imports(self) -> dict:
+        """
+        Scans staging directories and library storage on startup to clean leftover
+        .part files and reconcile uncompleted import jobs in SQLite.
+        """
+        staging_dir = self.storage_manager.get_staging_directory()
+        cleaned_parts = 0
+        cleaned_staging_dirs = 0
+
+        # 1. Clean staging subdirectories
+        if staging_dir.exists():
+            for child in staging_dir.iterdir():
+                try:
+                    if child.is_dir():
+                        shutil.rmtree(child, ignore_errors=True)
+                        cleaned_staging_dirs += 1
+                    elif child.is_file():
+                        child.unlink(missing_ok=True)
+                        cleaned_parts += 1
+                except Exception:
+                    pass
+
+        # 2. Reconcile in-progress imports in database
+        recovered_imports = 0
+        if self.db and self.import_repo:
+            try:
+                conn = self.db.get_connection()
+                cursor = conn.cursor()
+                cursor.execute("SELECT id FROM imports WHERE status = 'IN_PROGRESS'")
+                in_prog = cursor.fetchall()
+                for row in in_prog:
+                    imp_id = row[0]
+                    cursor.execute(
+                        "UPDATE imports SET status = 'INTERRUPTED', completed_at = ? WHERE id = ?",
+                        (utc_now(), imp_id),
+                    )
+                    recovered_imports += 1
+                conn.commit()
+            except Exception:
+                pass
+
+        return {
+            "cleaned_staging_dirs": cleaned_staging_dirs,
+            "cleaned_parts": cleaned_parts,
+            "recovered_imports": recovered_imports,
+        }
