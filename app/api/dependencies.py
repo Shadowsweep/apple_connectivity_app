@@ -11,6 +11,7 @@ from app.database.repositories.import_repository import ImportRepository
 from app.database.repositories.job_repository import JobRepository
 from app.database.repositories.library_repository import LibraryRepository
 from app.database.repositories.media_repository import MediaRepository
+from app.database.repositories.saved_search_repository import SavedSearchRepository
 from app.database.repositories.watch_repository import WatchRepository
 from app.duplicate.detector import DuplicateDetector
 from app.importer.importer import SafeImporter
@@ -35,6 +36,7 @@ class AppContext:
         self.db.initialize()
 
         self.media_repo = MediaRepository(self.db)
+        self.saved_search_repo = SavedSearchRepository(self.db)
         self.library_repo = LibraryRepository(self.db)
         self.device_repo = DeviceRepository(self.db)
         self.import_repo = ImportRepository(self.db)

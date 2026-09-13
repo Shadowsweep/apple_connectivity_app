@@ -140,3 +140,14 @@ class TrashRecord(BaseModel):
     media_id: str
     original_relative_path: str
     deleted_at: Optional[datetime] = None
+
+
+class SavedSearchRecord(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    query_json: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+

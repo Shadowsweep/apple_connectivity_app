@@ -27,6 +27,21 @@ class JobCreatedResponse(BaseModel):
     job_type: str
 
 
+class UnindexedItem(BaseModel):
+    relative_path: str
+    filename: str
+    size_bytes: int
+
+
+class LibraryHealthResponse(BaseModel):
+    total_active: int
+    missing_count: int
+    missing_items: list
+    unindexed_count: int
+    unindexed_items: list
+    is_healthy: bool
+
+
 @router.get("/library", response_model=LibraryInfoResponse)
 def get_library_info(ctx: AppContext = Depends(get_app_context)):
     lib = ctx.library_repo.get_or_create(str(ctx.storage_manager.library_root))
@@ -46,6 +61,39 @@ def get_library_info(ctx: AppContext = Depends(get_app_context)):
         formatted_usable=stats.formatted_usable,
         total_media_count=media_count,
     )
+
+
+@router.get("/library/health", response_model=LibraryHealthResponse)
+def get_library_health(ctx: AppContext = Depends(get_app_context)):
+    health_data = ctx.media_repo.scan_library_health(ctx.storage_manager.library_root)
+    return LibraryHealthResponse(**health_data)
+
+
+@router.post("/library/health/scan")
+def trigger_health_scan(ctx: AppContext = Depends(get_app_context)):
+    def health_task(job_id: str):
+        ctx.media_repo.scan_library_health(ctx.storage_manager.library_root)
+        ctx.job_repo.mark_completed(job_id, total=1)
+
+    job_id = ctx.job_manager.start_job(
+        job_type="HEALTH_SCAN",
+        target=health_task,
+    )
+    return {"job_id": job_id, "status": "STARTED"}
+
+
+@router.post("/library/index-unindexed")
+def trigger_index_unindexed(ctx: AppContext = Depends(get_app_context)):
+    """Indexes unindexed files discovered in library directly without copying."""
+    def index_task(job_id: str):
+        ctx.indexer.index_library()
+        ctx.job_repo.mark_completed(job_id, total=1)
+
+    job_id = ctx.job_manager.start_job(
+        job_type="INDEX_UNINDEXED",
+        target=index_task,
+    )
+    return {"job_id": job_id, "status": "STARTED"}
 
 
 @router.post("/library/index", response_model=JobCreatedResponse)
@@ -68,3 +116,4 @@ def trigger_rebuild_index(ctx: AppContext = Depends(get_app_context)):
 
     job = ctx.job_manager.submit_job("REBUILD_INDEX", rebuild_task)
     return JobCreatedResponse(job_id=job.id, status=job.status, job_type=job.job_type)
+

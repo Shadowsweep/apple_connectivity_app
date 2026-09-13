@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.dependencies import init_app_context
 from app.api.routes import (
     albums,
+    analytics,
+    duplicates,
     favorites,
     health,
     imports,
@@ -13,6 +15,8 @@ from app.api.routes import (
     libraries,
     media,
     playback,
+    searches,
+    timeline,
 )
 
 
@@ -52,6 +56,10 @@ def create_app(
     app.include_router(health.router, prefix="/api")
     app.include_router(libraries.router, prefix="/api")
     app.include_router(media.router, prefix="/api")
+    app.include_router(searches.router, prefix="/api")
+    app.include_router(analytics.router, prefix="/api")
+    app.include_router(timeline.router, prefix="/api")
+    app.include_router(duplicates.router, prefix="/api")
     app.include_router(imports.router, prefix="/api")
     app.include_router(jobs.router, prefix="/api")
     app.include_router(albums.router, prefix="/api")

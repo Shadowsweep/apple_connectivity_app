@@ -56,6 +56,15 @@
 - [x] Desktop Context Menu (`<ContextMenu />`) for right-click quick actions (Open, Favorite, Add to Album, Trash)
 - [x] Global `Ctrl+K` `<SearchModal />` with live categorised media and album discovery
 
-## Phase 7: Advanced Offline AI (Optional / Future)
+## Phase 7: Advanced Library & Storage Intelligence (Completed)
+- [x] Structured filter engine with URL query serialization (`/media?type=photo&minSize=...`)
+- [x] Advanced Filter Builder Modal (`FilterBuilderModal.tsx`) & Smart Collections Preset Bar (`SmartCollectionsBar.tsx`)
+- [x] SQLite-backed Saved Searches (`/api/searches`) with instant query execution
+- [x] Scalable on-demand Hierarchical Timeline (`/timeline`, `/api/timeline/years`, `/api/timeline/months`, `/api/timeline/media`)
+- [x] Offline Storage Intelligence & Analytics (`/storage`, `/api/analytics/storage` by format, year, size range, largest files)
+- [x] Duplicate Review & Resolution (`/duplicates`, `/api/duplicates` with "keep this copy" radio and safe soft-delete batching)
+- [x] Library Health & Integrity Monitor (`/api/library/health`, `MISSING` record detection, unindexed files in-place indexing)
+
+## Phase 8: Advanced Offline AI (Optional / Future)
 - [ ] Local ONNX / CLIP semantic search ("sunset on the beach")
 - [ ] Local facial clustering (FaceNet / InsightFace)

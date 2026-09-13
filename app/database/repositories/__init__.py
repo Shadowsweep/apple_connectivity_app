@@ -5,6 +5,7 @@ from .import_repository import ImportRepository
 from .job_repository import JobRepository
 from .library_repository import LibraryRepository
 from .media_repository import MediaRepository
+from .saved_search_repository import SavedSearchRepository
 from .watch_repository import WatchRepository
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     "JobRepository",
     "LibraryRepository",
     "MediaRepository",
+    "SavedSearchRepository",
     "WatchRepository",
 ]

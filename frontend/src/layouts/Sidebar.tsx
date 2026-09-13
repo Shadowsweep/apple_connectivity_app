@@ -13,6 +13,9 @@ import {
   Sparkles,
   Smartphone,
   HardDrive,
+  Calendar,
+  Copy,
+  PieChart,
 } from 'lucide-react';
 import { useLibraryInfo } from '../hooks/useLibrary';
 import { formatBytes } from '../utils/formatters';
@@ -25,8 +28,11 @@ export const Sidebar: React.FC = () => {
     { to: '/media', label: 'All Media', icon: <Grid className='w-4 h-4' /> },
     { to: '/photos', label: 'Photos', icon: <Image className='w-4 h-4' /> },
     { to: '/videos', label: 'Videos', icon: <Video className='w-4 h-4' /> },
+    { to: '/timeline', label: 'Timeline', icon: <Calendar className='w-4 h-4' /> },
     { to: '/albums', label: 'Albums', icon: <FolderHeart className='w-4 h-4' /> },
     { to: '/favorites', label: 'Favorites', icon: <Star className='w-4 h-4' /> },
+    { to: '/duplicates', label: 'Duplicates', icon: <Copy className='w-4 h-4' /> },
+    { to: '/storage', label: 'Storage', icon: <PieChart className='w-4 h-4' /> },
     { to: '/import', label: 'Import Device', icon: <Download className='w-4 h-4' /> },
     { to: '/clean', label: 'Clean Mobile', icon: <Sparkles className='w-4 h-4' /> },
     { to: '/trash', label: 'Trash', icon: <Trash2 className='w-4 h-4' /> },

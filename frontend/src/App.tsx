@@ -11,6 +11,9 @@ import { ImportPage } from './pages/ImportPage';
 import { CleanMobilePage } from './pages/CleanMobilePage';
 import { TrashPage } from './pages/TrashPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { TimelinePage } from './pages/TimelinePage';
+import { DuplicatesPage } from './pages/DuplicatesPage';
+import { StorageAnalyticsPage } from './pages/StorageAnalyticsPage';
 import { BackendStatusModal } from './components/common/BackendStatusModal';
 
 const queryClient = new QueryClient({
@@ -33,9 +36,12 @@ export const App: React.FC = () => {
             <Route path='media' element={<MediaPage initialType='ALL' />} />
             <Route path='photos' element={<MediaPage initialType='PHOTO' />} />
             <Route path='videos' element={<MediaPage initialType='VIDEO' />} />
+            <Route path='timeline' element={<TimelinePage />} />
             <Route path='albums' element={<AlbumsPage />} />
             <Route path='albums/:albumId' element={<AlbumDetailPage />} />
             <Route path='favorites' element={<FavoritesPage />} />
+            <Route path='duplicates' element={<DuplicatesPage />} />
+            <Route path='storage' element={<StorageAnalyticsPage />} />
             <Route path='import' element={<ImportPage />} />
             <Route path='clean' element={<CleanMobilePage />} />
             <Route path='trash' element={<TrashPage />} />
