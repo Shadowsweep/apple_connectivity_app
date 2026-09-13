@@ -95,3 +95,12 @@
 - [x] Full diagnostics report & JSON export API (`/api/diagnostics`, `/api/diagnostics/export`)
 - [x] Reliability & database controls integrated into frontend Settings (`SettingsPage.tsx`)
 - [x] Comprehensive failure-injection and recovery test suite (`tests/test_reliability_recovery.py`, 51 total tests passed)
+
+## Phase 11: Windows Packaging & Distribution (Completed)
+- [x] Self-contained Python backend packaging via PyInstaller (`build_backend.py`, 22 MB single binary, zero user Python/Node dependencies)
+- [x] Dynamic localhost port selection & startup health polling (`127.0.0.1:<PORT>/api/health`)
+- [x] Rust Tauri v2 child process management with orphan cleanup on app termination
+- [x] NSIS Windows Installer configuration (`src-tauri/tauri.conf.json`) with safe uninstall guarantee (never deletes user media vault)
+- [x] Single-command master build orchestration (`build_release.py`) combining pytest suite, Vite compile, and PyInstaller bundling
+- [x] Version synchronization to `1.0.0` across all descriptors (`Cargo.toml`, `tauri.conf.json`, `package.json`, `pyproject.toml`, `app/__init__.py`)
+

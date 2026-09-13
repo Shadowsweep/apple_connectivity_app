@@ -1,3 +1,4 @@
+import sys
 import sqlite3
 from pathlib import Path
 from typing import List
@@ -8,7 +9,10 @@ class MigrationRunner:
 
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
-        self.migrations_dir = Path(__file__).parent
+        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+            self.migrations_dir = Path(sys._MEIPASS) / "app" / "database" / "migrations"
+        else:
+            self.migrations_dir = Path(__file__).parent
 
     def get_applied_versions(self) -> List[int]:
         cursor = self.conn.cursor()

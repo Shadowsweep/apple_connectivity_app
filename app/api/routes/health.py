@@ -28,7 +28,7 @@ def get_health(ctx: AppContext = Depends(get_app_context)):
     return HealthResponse(
         status="ok",
         app="MEMEASY",
-        version="0.1.0",
+        version="1.0.0",
         library_path=str(ctx.storage_manager.library_root),
         database_ok=db_ok,
     )

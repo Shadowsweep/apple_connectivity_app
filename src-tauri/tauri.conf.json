@@ -1,7 +1,7 @@
 {
   "": "https://raw.githubusercontent.com/tauri-apps/tauri/refs/heads/v2/crates/tauri-cli/schema.json",
   "productName": "MEMEASY",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "identifier": "com.memeasy.vault",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "MEMEASY \u2014 Local Media Vault",
+        "title": "MEMEASY — Local Media Vault",
         "width": 1280,
         "height": 820,
         "minWidth": 960,
@@ -30,8 +30,16 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "copyright": "Copyright 2026 MEMEASY",
+    "shortDescription": "Windows-first Local Media Platform",
+    "longDescription": "Local-first photo and video management platform for Windows.",
     "externalBin": [
       "binaries/memeasy-backend"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    }
   }
 }

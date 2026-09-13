@@ -13,7 +13,7 @@ def test_api_health_endpoint(tmp_path: Path):
     data = response.json()
     assert data["status"] == "ok"
     assert data["app"] == "MEMEASY"
-    assert data["version"] == "0.1.0"
+    assert data["version"] == "1.0.0"
     assert data["database_ok"] is True
 
 

@@ -323,10 +323,11 @@ def main():
     serve_parser = subparsers.add_parser("serve", help="Launch local FastAPI service")
     serve_parser.add_argument("--host", type=str, default="127.0.0.1", help="Host address (default: 127.0.0.1)")
     serve_parser.add_argument("--port", type=int, default=8000, help="Port number (default: 8000)")
+    serve_parser.add_argument("--library", type=str, help="Path to destination library")
 
     args = parser.parse_args()
 
-    lib_path = Path(args.library) if args.library else None
+    lib_path = Path(args.library) if getattr(args, "library", None) else None
     cli = MemeEasyCLI(default_library=lib_path)
     if args.mock_device:
         cli.active_device = LocalFolderDevice(Path(args.mock_device), name="Custom Source")
