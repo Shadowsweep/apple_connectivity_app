@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Local database and cache
+*.db
+*.sqlite3
+.memeasy/tmp/
+.memeasy/thumbnails/
+
+# Test output
+tests/fixtures/temp_*

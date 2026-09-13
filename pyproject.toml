@@ -1,0 +1,15 @@
+[project]
+name = "memeasy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pillow>=12.3.0",
+    "pydantic>=2.13.5",
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+

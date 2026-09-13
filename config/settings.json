@@ -1,0 +1,23 @@
+{
+  "default_library_path": "D:\\MEMEASY_Library",
+  "safety_reserve_bytes": 10737418240,
+  "allowed_photo_extensions": [
+    ".jpg",
+    ".jpeg",
+    ".heic",
+    ".png",
+    ".raw",
+    ".dng",
+    ".gif",
+    ".webp"
+  ],
+  "allowed_video_extensions": [
+    ".mov",
+    ".mp4",
+    ".m4v",
+    ".avi",
+    ".mkv"
+  ],
+  "staging_dir_name": ".memeasy",
+  "log_level": "INFO"
+}
