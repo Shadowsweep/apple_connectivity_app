@@ -11,6 +11,7 @@ import { ImportPage } from './pages/ImportPage';
 import { CleanMobilePage } from './pages/CleanMobilePage';
 import { TrashPage } from './pages/TrashPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { BackendStatusModal } from './components/common/BackendStatusModal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +25,7 @@ const queryClient = new QueryClient({
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
+      <BackendStatusModal />
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<AppShell />}>

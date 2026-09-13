@@ -1,0 +1,15 @@
+{
+  "": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default permissions for MEMEASY application shell",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "shell:default",
+    "shell:allow-spawn",
+    "process:default",
+    "single-instance:default"
+  ]
+}

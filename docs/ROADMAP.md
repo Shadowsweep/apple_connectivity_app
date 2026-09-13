@@ -39,10 +39,14 @@
 - [x] Starred favorites & soft-deleted trash management
 - [x] Library settings, incremental index & rebuild triggers, service health diagnostics
 
-## Phase 5: Tauri Desktop Shell
-- [ ] Tauri v2 Rust wrapper for Windows 10/11
-- [ ] Python backend bundling as a Tauri sidecar (no Python install required for user)
-- [ ] Native Windows notifications and system tray integration
+## Phase 5: Tauri Desktop Integration (Completed)
+- [x] Standalone Python executable compilation (`dist/memeasy-backend.exe` via PyInstaller, zero Python runtime needed on user PC)
+- [x] Tauri v2 desktop shell project (`src-tauri/`) with Cargo dependencies, `tauri.conf.json`, `capabilities/default.json`
+- [x] Python backend sidecar integration in Tauri (`src-tauri/binaries/memeasy-backend-x86_64-pc-windows-msvc.exe`)
+- [x] Dynamic localhost port selection & startup health polling (`GET /api/health`)
+- [x] Single-instance desktop enforcement
+- [x] Child process lifecycle management & orphan process prevention on window exit
+- [x] React dynamic backend URL resolver and crash recovery modal (`BackendStatusModal.tsx`)
 
 ## Phase 6: Rich Media Experience
 - [ ] Built-in HDR video player with resume/continue watching
