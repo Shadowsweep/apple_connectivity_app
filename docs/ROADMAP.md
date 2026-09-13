@@ -19,10 +19,14 @@
 - [x] Indexing existing physical libraries & full index rebuild with online backups (`.db.bak`)
 - [x] Complete test suite verification (28 passed)
 
-## Phase 3: Local FastAPI Service
-- [ ] Localhost REST API for devices, library, jobs, and streaming
-- [ ] WebSocket event stream for background progress
-- [ ] Video range-request streaming endpoint
+## Phase 3: Local FastAPI Service (Completed)
+- [x] Localhost REST API (`127.0.0.1`) with modular route structure
+- [x] HTTP Range video streaming engine (`206 Partial Content`)
+- [x] Disk-cached thumbnail generation (`.memeasy/thumbnails/`)
+- [x] Background job executor with progress tracking
+- [x] Virtual albums, favorites, and watch progress endpoints
+- [x] Path traversal security containment
+- [x] Full API test suite (37 total tests passed)
 
 ## Phase 4: React + Vite Frontend
 - [ ] Netflix-style dark mode theme (from `DESIGN.md`)

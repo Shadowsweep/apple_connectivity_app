@@ -3,7 +3,8 @@
 ## 1. Local-Only Trust Model
 
 - **No Cloud Telemetry or Media Upload**: Media never leaves the user's local machine or local storage drives.
-- **Localhost Binding**: FastAPI server (Phase 3+) binds exclusively to `127.0.0.1` / `[::1]`. It does not listen on `0.0.0.0` or expose public network ports.
+- **Localhost Binding**: FastAPI server binds exclusively to `127.0.0.1` (never `0.0.0.0`).
+- **CORS Confinement**: CORS middleware explicitly restricts origins to local dev servers (`localhost:3000`, `localhost:5173`) and desktop shell origins (`tauri://localhost`, `https://tauri.localhost`).
 
 ---
 

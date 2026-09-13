@@ -1,6 +1,7 @@
 import os
 import shutil
 import sqlite3
+import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -9,7 +10,6 @@ from typing import Generator, Optional
 from app.database.migrations.runner import MigrationRunner
 
 
-# Register modern ISO string adapters/converters for datetime to avoid deprecation warnings
 def _adapt_datetime_iso(val: datetime) -> str:
     return val.isoformat()
 
@@ -26,18 +26,20 @@ sqlite3.register_converter("DATETIME", _convert_datetime_iso)
 
 
 class DatabaseConnection:
-    """Manages SQLite connection lifecycle, WAL mode, foreign keys, and backups."""
+    """Manages thread-safe SQLite connections, WAL mode, foreign keys, and backups."""
 
     def __init__(self, db_path: Path):
         self.db_path = Path(db_path).resolve()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._connection: Optional[sqlite3.Connection] = None
+        self._local = threading.local()
 
     def get_connection(self) -> sqlite3.Connection:
-        if self._connection is None:
+        conn = getattr(self._local, "connection", None)
+        if conn is None:
             conn = sqlite3.connect(
                 str(self.db_path),
-                timeout=10.0,
+                timeout=15.0,
+                check_same_thread=False,
                 detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
             )
             conn.row_factory = sqlite3.Row
@@ -46,9 +48,9 @@ class DatabaseConnection:
             conn.execute("PRAGMA journal_mode = WAL;")
             conn.execute("PRAGMA synchronous = NORMAL;")
             conn.execute("PRAGMA busy_timeout = 5000;")
-            self._connection = conn
+            self._local.connection = conn
 
-        return self._connection
+        return conn
 
     def initialize(self):
         """Runs pending database schema migrations."""
@@ -90,9 +92,10 @@ class DatabaseConnection:
         return backup_path
 
     def close(self):
-        if self._connection is not None:
+        conn = getattr(self._local, "connection", None)
+        if conn is not None:
             try:
-                self._connection.close()
+                conn.close()
             except Exception:
                 pass
-            self._connection = None
+            self._local.connection = None

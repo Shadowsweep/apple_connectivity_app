@@ -320,6 +320,10 @@ def main():
     list_parser.add_argument("--type", type=str, help="Filter by media type")
     list_parser.add_argument("--search", type=str, help="Search query")
 
+    serve_parser = subparsers.add_parser("serve", help="Launch local FastAPI service")
+    serve_parser.add_argument("--host", type=str, default="127.0.0.1", help="Host address (default: 127.0.0.1)")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port number (default: 8000)")
+
     args = parser.parse_args()
 
     lib_path = Path(args.library) if args.library else None
@@ -340,6 +344,12 @@ def main():
         )
         for r in results:
             print(f"[{r.media_type}] {r.filename} -> {r.relative_path} ({StorageManager.format_bytes(r.size_bytes)})")
+    elif args.command == "serve":
+        import uvicorn
+        from app.api.main import create_app
+        app = create_app(cli.storage_manager.library_root)
+        print(f"[*] Starting MEMEASY API server on http://{args.host}:{args.port}")
+        uvicorn.run(app, host=args.host, port=args.port, log_level="info")
     else:
         cli.run_menu()
 
