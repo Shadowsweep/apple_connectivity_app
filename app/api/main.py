@@ -7,6 +7,7 @@ from app.api.dependencies import init_app_context
 from app.api.routes import (
     albums,
     analytics,
+    clean,
     duplicates,
     favorites,
     health,
@@ -56,6 +57,7 @@ def create_app(
     app.include_router(health.router, prefix="/api")
     app.include_router(libraries.router, prefix="/api")
     app.include_router(media.router, prefix="/api")
+    app.include_router(clean.router, prefix="/api")
     app.include_router(searches.router, prefix="/api")
     app.include_router(analytics.router, prefix="/api")
     app.include_router(timeline.router, prefix="/api")

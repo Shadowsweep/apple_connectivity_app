@@ -151,3 +151,35 @@ class SavedSearchRecord(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
+
+class CleanupHistoryRecord(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    device_id: str
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    total_items: int = 0
+    deleted_items: int = 0
+    failed_items: int = 0
+    bytes_reclaimed: int = 0
+    status: str = "COMPLETED"
+
+
+class CleanupItemRecord(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    session_id: str
+    device_id: str
+    local_media_id: Optional[str] = None
+    device_identifier: str
+    device_filename: str
+    device_size: int
+    verification_status: str
+    cleanup_status: str
+    scanned_at: Optional[datetime] = None
+    deleted_at: Optional[datetime] = None
+    error: Optional[str] = None
+
+

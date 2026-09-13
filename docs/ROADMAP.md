@@ -65,6 +65,19 @@
 - [x] Duplicate Review & Resolution (`/duplicates`, `/api/duplicates` with "keep this copy" radio and safe soft-delete batching)
 - [x] Library Health & Integrity Monitor (`/api/library/health`, `MISSING` record detection, unindexed files in-place indexing)
 
-## Phase 8: Advanced Offline AI (Optional / Future)
+## Phase 8: Clean Mobile (Completed)
+- [x] Extended `MediaDevice` abstraction with `supports_delete`, `delete_media(entry)`, and post-deletion `verify_deleted(entry)`
+- [x] Multi-tier conservative matching pipeline (`CLEANABLE`, `UNVERIFIED_CANDIDATE`, `NOT_BACKED_UP`)
+- [x] Zero local data loss enforcement (device deletion only, local vault files remain untouched)
+- [x] Cryptographic SHA-256 validation & size matching before classification
+- [x] SQLite audit logging with `mobile_cleanup_history` and `mobile_cleanup_items` tables (`003_mobile_cleanup.sql`)
+- [x] Pre-deletion re-verification immediately before each device file removal
+- [x] Disconnection safety handler (pauses remaining operations gracefully)
+- [x] Two-tier fallback for read-only device providers with safe manual report mode
+- [x] Two-stage destructive double confirmation UI (`CleanConfirmationModal.tsx`) with typed acknowledgement
+- [x] Verification inspection drawer (`CleanMobileReviewModal.tsx`) and audit trail modal (`CleanupHistoryModal.tsx`)
+- [x] Complete test suite verification (45 tests passed)
+
+## Phase 9: Advanced Offline AI (Optional / Future)
 - [ ] Local ONNX / CLIP semantic search ("sunset on the beach")
 - [ ] Local facial clustering (FaceNet / InsightFace)

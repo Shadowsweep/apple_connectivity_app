@@ -1,4 +1,5 @@
 from .album_repository import AlbumRepository
+from .cleanup_repository import CleanupRepository
 from .device_repository import DeviceRepository
 from .favorite_repository import FavoriteRepository
 from .import_repository import ImportRepository
@@ -10,6 +11,7 @@ from .watch_repository import WatchRepository
 
 __all__ = [
     "AlbumRepository",
+    "CleanupRepository",
     "DeviceRepository",
     "FavoriteRepository",
     "ImportRepository",

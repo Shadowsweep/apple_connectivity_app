@@ -3,8 +3,10 @@ from typing import Optional
 
 from app.api.jobs_manager import JobManager
 from app.api.thumbnails import ThumbnailService
+from app.cleaner.engine import CleanMobileEngine
 from app.database.connection import DatabaseConnection
 from app.database.repositories.album_repository import AlbumRepository
+from app.database.repositories.cleanup_repository import CleanupRepository
 from app.database.repositories.device_repository import DeviceRepository
 from app.database.repositories.favorite_repository import FavoriteRepository
 from app.database.repositories.import_repository import ImportRepository
@@ -13,6 +15,7 @@ from app.database.repositories.library_repository import LibraryRepository
 from app.database.repositories.media_repository import MediaRepository
 from app.database.repositories.saved_search_repository import SavedSearchRepository
 from app.database.repositories.watch_repository import WatchRepository
+from app.device.iphone import MediaDevice, MockIPhoneDevice
 from app.duplicate.detector import DuplicateDetector
 from app.importer.importer import SafeImporter
 from app.indexer.indexer import LibraryIndexer
@@ -37,6 +40,7 @@ class AppContext:
 
         self.media_repo = MediaRepository(self.db)
         self.saved_search_repo = SavedSearchRepository(self.db)
+        self.cleanup_repo = CleanupRepository(self.db)
         self.library_repo = LibraryRepository(self.db)
         self.device_repo = DeviceRepository(self.db)
         self.import_repo = ImportRepository(self.db)
@@ -53,6 +57,27 @@ class AppContext:
         self.indexer = LibraryIndexer(self.storage_manager, self.db)
         self.thumbnails = ThumbnailService(self.storage_manager)
         self.job_manager = JobManager(self.job_repo)
+
+        self.cleaner_engine = CleanMobileEngine(
+            library_root=self.library_root,
+            media_repo=self.media_repo,
+            cleanup_repo=self.cleanup_repo,
+        )
+        self.active_scan_results: dict = {}
+        self._connected_device: Optional[MediaDevice] = None
+
+    def get_connected_device(self) -> MediaDevice:
+        """Returns currently active device or fallback Mock iPhone for testing/demo."""
+        if self._connected_device is not None and self._connected_device.is_connected:
+            return self._connected_device
+        # Default fallback: mock device folder
+        mock_path = self.library_root.parent / "MockiPhone"
+        mock_path.mkdir(parents=True, exist_ok=True)
+        self._connected_device = MockIPhoneDevice(mock_path, name="iPhone 15 Pro (Connected)")
+        return self._connected_device
+
+    def set_connected_device(self, device: Optional[MediaDevice]):
+        self._connected_device = device
 
 
 _GLOBAL_CONTEXT: Optional[AppContext] = None

@@ -71,29 +71,29 @@ def get_library_health(ctx: AppContext = Depends(get_app_context)):
 
 @router.post("/library/health/scan")
 def trigger_health_scan(ctx: AppContext = Depends(get_app_context)):
-    def health_task(job_id: str):
+    def health_task(progress_callback):
         ctx.media_repo.scan_library_health(ctx.storage_manager.library_root)
-        ctx.job_repo.mark_completed(job_id, total=1)
+        progress_callback(1, 1)
 
-    job_id = ctx.job_manager.start_job(
+    job = ctx.job_manager.submit_job(
         job_type="HEALTH_SCAN",
-        target=health_task,
+        task_fn=health_task,
     )
-    return {"job_id": job_id, "status": "STARTED"}
+    return {"job_id": job.id, "status": job.status}
 
 
 @router.post("/library/index-unindexed")
 def trigger_index_unindexed(ctx: AppContext = Depends(get_app_context)):
     """Indexes unindexed files discovered in library directly without copying."""
-    def index_task(job_id: str):
+    def index_task(progress_callback):
         ctx.indexer.index_library()
-        ctx.job_repo.mark_completed(job_id, total=1)
+        progress_callback(1, 1)
 
-    job_id = ctx.job_manager.start_job(
+    job = ctx.job_manager.submit_job(
         job_type="INDEX_UNINDEXED",
-        target=index_task,
+        task_fn=index_task,
     )
-    return {"job_id": job_id, "status": "STARTED"}
+    return {"job_id": job.id, "status": job.status}
 
 
 @router.post("/library/index", response_model=JobCreatedResponse)

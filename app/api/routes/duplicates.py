@@ -33,14 +33,11 @@ def list_duplicate_groups(ctx: AppContext = Depends(get_app_context)):
 @router.post("/duplicates/scan")
 def scan_duplicates(ctx: AppContext = Depends(get_app_context)):
     """Runs a duplicate scan job to ensure all library items have valid sha256 hashes."""
-    def _run_duplicate_scan(job_id: str):
+    def _run_duplicate_scan(progress_callback):
         active_items = ctx.media_repo.filter_media(limit=100000)
         total = len(active_items)
-        ctx.job_repo.update_progress(job_id, progress=0, total=total)
 
-        updated_count = 0
         for idx, media in enumerate(active_items):
-            # Check if file has hash
             if not media.hash_sha256 or len(media.hash_sha256) < 10:
                 abs_path = ctx.storage_manager.library_root / media.relative_path
                 if abs_path.exists():
@@ -48,19 +45,16 @@ def scan_duplicates(ctx: AppContext = Depends(get_app_context)):
                         h = ctx.duplicate_detector.calculate_file_hash(abs_path)
                         media.hash_sha256 = h
                         ctx.media_repo.insert_or_update(media)
-                        updated_count += 1
                     except OSError:
                         pass
             if idx % 20 == 0 or idx == total - 1:
-                ctx.job_repo.update_progress(job_id, progress=idx + 1, total=total)
+                progress_callback(idx + 1, total)
 
-        ctx.job_repo.mark_completed(job_id, total=total)
-
-    job_id = ctx.job_manager.start_job(
+    job = ctx.job_manager.submit_job(
         job_type="DUPLICATE_SCAN",
-        target=_run_duplicate_scan,
+        task_fn=_run_duplicate_scan,
     )
-    return {"job_id": job_id, "status": "STARTED"}
+    return {"job_id": job.id, "status": job.status}
 
 
 @router.post("/duplicates/trash", response_model=TrashDuplicatesResponse)
