@@ -31,7 +31,10 @@ The ingestion engine follows a strict 9-stage deterministic pipeline:
    └── If collision occurs, compare hashes: if identical -> discard duplicate; if distinct -> rename cleanly.
 
 9. INDEX & LOG
-   └── Update local media catalog and log transaction metrics.
+   └── In an atomic SQLite transaction:
+       • Register/update `MediaRecord` with metadata, relative path, and SHA-256 hash.
+       • Insert `ImportItemRecord` audit trail entry (SUCCESS / FAILED / SKIPPED).
+       • Update `ImportRecord` summary counters upon completion.
 ```
 
 ---

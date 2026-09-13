@@ -1,6 +1,6 @@
 # MEMEASY Development Roadmap
 
-## Phase 1: Core Media Engine & CLI (Current Focus)
+## Phase 1: Core Media Engine & CLI
 - [x] Project scaffolding and documentation suite (`ARCHITECTURE.md`, `DATABASE.md`, `MEMORY.md`, `IMPORT_PIPELINE.md`, `SECURITY.md`, `ROADMAP.md`, `DESIGN.md`)
 - [x] Media device abstraction & Mock iPhone source
 - [x] Resilient metadata extractor (EXIF, MP4/QuickTime, filename fallback)
@@ -10,10 +10,14 @@
 - [x] Storage calculations & 10 GB safety reserve
 - [x] Automated test suite & interactive CLI
 
-## Phase 2: SQLite Metadata Index
-- [ ] SQLite schema implementation (`libraries`, `media`, `imports`, `albums`, `favorites`, `watch_progress`)
-- [ ] Fast indexed search & filtering
-- [ ] Index rebuild tool for existing libraries
+## Phase 2: SQLite Metadata Index (Completed)
+- [x] SQLite schema implementation (`libraries`, `devices`, `media`, `imports`, `import_items`, `jobs`, `albums`, `album_items`, `favorites`, `watch_progress`, `trash`)
+- [x] Repository pattern abstraction & transaction safety
+- [x] Safe importer atomic database registration
+- [x] Fast indexed search & multi-criteria filtering
+- [x] Virtual albums, favorites, and video continue watching tracking
+- [x] Indexing existing physical libraries & full index rebuild with online backups (`.db.bak`)
+- [x] Complete test suite verification (28 passed)
 
 ## Phase 3: Local FastAPI Service
 - [ ] Localhost REST API for devices, library, jobs, and streaming
