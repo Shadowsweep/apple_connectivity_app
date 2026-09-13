@@ -40,8 +40,10 @@ export const FavoritesPage: React.FC = () => {
 
       <MediaViewer
         media={inspectingMedia}
+        itemsList={favorites || []}
         isOpen={!!inspectingMedia}
         onClose={() => setInspectingMedia(null)}
+        onNavigate={(m) => setInspectingMedia(m)}
         isFavorite={inspectingMedia ? favSet.has(inspectingMedia.id) : false}
         onToggleFavorite={() => {
           if (inspectingMedia) {

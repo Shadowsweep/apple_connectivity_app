@@ -48,10 +48,13 @@
 - [x] Child process lifecycle management & orphan process prevention on window exit
 - [x] React dynamic backend URL resolver and crash recovery modal (`BackendStatusModal.tsx`)
 
-## Phase 6: Rich Media Experience
-- [ ] Built-in HDR video player with resume/continue watching
-- [ ] Live Photo playback (paired image + MOV)
-- [ ] Clean Mobile workflow (verified safe deletion)
+## Phase 6: Netflix-Style Media Experience (Completed)
+- [x] Cinematic Hero Banner with featured collections & backdrop vignette
+- [x] Horizontal scrollable `<MediaRow />` reels (Continue Watching, Recently Added, Photos, Videos, Favorites)
+- [x] Desktop `<VideoPlayer />` with keyboard hotkeys (`Space`, `←`/`→`, `F`, `M`, `Esc`), playback speed control (1x, 1.25x, 1.5x, 2x), and progress sync
+- [x] Fullscreen Lightbox `<MediaViewer />` with current-result-set next/prev navigation, zoom/pan controls, and EXIF panel
+- [x] Desktop Context Menu (`<ContextMenu />`) for right-click quick actions (Open, Favorite, Add to Album, Trash)
+- [x] Global `Ctrl+K` `<SearchModal />` with live categorised media and album discovery
 
 ## Phase 7: Advanced Offline AI (Optional / Future)
 - [ ] Local ONNX / CLIP semantic search ("sunset on the beach")

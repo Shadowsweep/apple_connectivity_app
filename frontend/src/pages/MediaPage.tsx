@@ -54,8 +54,10 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
 
       <MediaViewer
         media={inspectingMedia}
+        itemsList={mediaList?.items || []}
         isOpen={!!inspectingMedia}
         onClose={() => setInspectingMedia(null)}
+        onNavigate={(m) => setInspectingMedia(m)}
         isFavorite={inspectingMedia ? favSet.has(inspectingMedia.id) : false}
         onToggleFavorite={() => {
           if (inspectingMedia) {

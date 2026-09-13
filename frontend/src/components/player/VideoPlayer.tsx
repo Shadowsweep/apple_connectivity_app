@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, Check } from 'lucide-react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, Check, FastForward } from 'lucide-react';
 import { mediaApi } from '../../api/mediaApi';
 import { playbackApi } from '../../api/playbackApi';
 import { formatDuration } from '../../utils/formatters';
@@ -7,28 +7,38 @@ import { formatDuration } from '../../utils/formatters';
 interface VideoPlayerProps {
   mediaId: string;
   initialPositionMs?: number;
+  filename?: string;
   onClose?: () => void;
 }
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   mediaId,
   initialPositionMs = 0,
+  filename,
+  onClose,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTimeMs, setCurrentTimeMs] = useState(initialPositionMs);
   const [durationMs, setDurationMs] = useState(0);
+  const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [showControls, setShowControls] = useState(true);
 
   const streamUrl = mediaApi.getStreamUrl(mediaId);
 
+  // Sync initial position
   useEffect(() => {
     if (videoRef.current && initialPositionMs > 0) {
       videoRef.current.currentTime = initialPositionMs / 1000;
     }
   }, [initialPositionMs]);
 
+  // Periodic watch progress sync
   useEffect(() => {
     const interval = setInterval(() => {
       if (videoRef.current && isPlaying) {
@@ -60,7 +70,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
   }, [mediaId, isPlaying, durationMs]);
 
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
     if (isPlaying) {
       videoRef.current.pause();
@@ -69,7 +79,72 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       videoRef.current.play();
       setIsPlaying(true);
     }
-  };
+  }, [isPlaying]);
+
+  const seekRelative = useCallback((seconds: number) => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = Math.max(0, Math.min(videoRef.current.duration || 0, videoRef.current.currentTime + seconds));
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!containerRef.current) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      containerRef.current.requestFullscreen();
+    }
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    if (!videoRef.current) return;
+    const nextMute = !isMuted;
+    videoRef.current.muted = nextMute;
+    setIsMuted(nextMute);
+  }, [isMuted]);
+
+  // Desktop Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+        return;
+      }
+
+      switch (e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          togglePlay();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          seekRelative(-5);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          seekRelative(5);
+          break;
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          toggleMute();
+          break;
+        case 'Escape':
+          if (!document.fullscreenElement && onClose) {
+            onClose();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePlay, seekRelative, toggleFullscreen, toggleMute, onClose]);
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
@@ -87,13 +162,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const toggleFullscreen = () => {
+  const cycleSpeed = () => {
     if (!videoRef.current) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      videoRef.current.requestFullscreen();
-    }
+    const speeds = [1, 1.25, 1.5, 2];
+    const nextIdx = (speeds.indexOf(playbackRate) + 1) % speeds.length;
+    const nextRate = speeds[nextIdx];
+    videoRef.current.playbackRate = nextRate;
+    setPlaybackRate(nextRate);
   };
 
   const handleEnded = () => {
@@ -109,7 +184,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   return (
-    <div className='relative w-full aspect-video bg-black rounded-xl overflow-hidden group shadow-2xl flex flex-col justify-end'>
+    <div
+      ref={containerRef}
+      onMouseMove={() => setShowControls(true)}
+      className='relative w-full aspect-video bg-black rounded-3xl overflow-hidden group shadow-2xl flex flex-col justify-end select-none'
+    >
       <video
         ref={videoRef}
         src={streamUrl}
@@ -121,7 +200,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onPause={() => setIsPlaying(false)}
       />
 
-      <div className='absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
+      {/* Top Title Overlay */}
+      {filename && (
+        <div className={'absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black/80 to-transparent transition-opacity duration-300 pointer-events-none ' + (showControls ? 'opacity-100' : 'opacity-0')}>
+          <h3 className='text-sm font-semibold text-white truncate max-w-xl'>{filename}</h3>
+        </div>
+      )}
+
+      {/* Control Bar Overlay */}
+      <div className={'absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex flex-col gap-3 transition-opacity duration-300 ' + (showControls ? 'opacity-100' : 'opacity-0')}>
+        {/* Scrub Bar */}
         <div className='flex items-center gap-2'>
           <input
             type='range'
@@ -133,54 +221,59 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           />
         </div>
 
+        {/* Action Controls Row */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3'>
             <button
               onClick={togglePlay}
-              className='p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors'
+              className='p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors'
             >
-              {isPlaying ? <Pause className='w-4 h-4' /> : <Play className='w-4 h-4 fill-white' />}
+              {isPlaying ? <Pause className='w-5 h-5' /> : <Play className='w-5 h-5 fill-white' />}
             </button>
 
             <button
-              onClick={() => {
-                if (videoRef.current) {
-                  videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
-                }
-              }}
+              onClick={() => seekRelative(-5)}
               className='p-2 text-[#A0A6B8] hover:text-white transition-colors'
-              title='Replay 10s'
+              title='Skip -5s (Left Arrow)'
             >
               <RotateCcw className='w-4 h-4' />
             </button>
 
-            <span className='text-xs text-[#A0A6B8]'>
+            <span className='text-xs font-mono text-[#A0A6B8]'>
               {formatDuration(currentTimeMs)} / {formatDuration(durationMs)}
             </span>
           </div>
 
           <div className='flex items-center gap-3'>
             {isCompleted && (
-              <span className='px-2 py-0.5 rounded text-[11px] font-semibold bg-[#00D68F]/20 text-[#00D68F] flex items-center gap-1'>
+              <span className='px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#00D68F]/20 text-[#00D68F] flex items-center gap-1'>
                 <Check className='w-3 h-3' /> Watched
               </span>
             )}
 
+            {/* Playback Speed Pill */}
             <button
-              onClick={() => {
-                if (!videoRef.current) return;
-                const nextMute = !isMuted;
-                videoRef.current.muted = nextMute;
-                setIsMuted(nextMute);
-              }}
-              className='p-2 text-[#A0A6B8] hover:text-white transition-colors'
+              onClick={cycleSpeed}
+              className='px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors flex items-center gap-1'
             >
-              {isMuted ? <VolumeX className='w-4 h-4' /> : <Volume2 className='w-4 h-4' />}
+              <FastForward className='w-3 h-3 text-[#2E7CF6]' />
+              {playbackRate + 'x'}
             </button>
 
+            {/* Volume */}
+            <button
+              onClick={toggleMute}
+              className='p-2 text-[#A0A6B8] hover:text-white transition-colors'
+              title='Mute (M)'
+            >
+              {isMuted ? <VolumeX className='w-4 h-4 text-[#FF3B30]' /> : <Volume2 className='w-4 h-4' />}
+            </button>
+
+            {/* Fullscreen */}
             <button
               onClick={toggleFullscreen}
               className='p-2 text-[#A0A6B8] hover:text-white transition-colors'
+              title='Fullscreen (F)'
             >
               <Maximize className='w-4 h-4' />
             </button>

@@ -68,8 +68,10 @@ export const AlbumDetailPage: React.FC = () => {
 
       <MediaViewer
         media={inspectingMedia}
+        itemsList={albumDetail.items}
         isOpen={!!inspectingMedia}
         onClose={() => setInspectingMedia(null)}
+        onNavigate={(m) => setInspectingMedia(m)}
         isFavorite={inspectingMedia ? favSet.has(inspectingMedia.id) : false}
         onToggleFavorite={() => {
           if (inspectingMedia) {

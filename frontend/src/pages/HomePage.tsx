@@ -1,194 +1,226 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Image, Video, Sparkles, Download, Play, Clock, HardDrive } from 'lucide-react';
+import { Image, Video, Sparkles, Star, Play, Clock, HardDrive } from 'lucide-react';
 import { useLibraryInfo } from '../hooks/useLibrary';
 import { useMediaList, useFavorites, useToggleFavorite } from '../hooks/useMedia';
 import { useContinueWatching } from '../hooks/usePlayback';
-import { MediaCard } from '../components/media/MediaCard';
+import { HeroBanner } from '../components/media/HeroBanner';
+import { MediaRow } from '../components/media/MediaRow';
 import { MediaViewer } from '../components/media/MediaViewer';
 import { VideoPlayer } from '../components/player/VideoPlayer';
-import { Button } from '../components/common/Button';
 import { MediaRecord } from '../types/media';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { data: lib } = useLibraryInfo();
-  const { data: recentMedia, isLoading: isRecentLoading } = useMediaList({ limit: 12 });
+  
+  const { data: recentMedia } = useMediaList({ limit: 16 });
+  const { data: photoMedia } = useMediaList({ type: 'PHOTO', limit: 16 });
+  const { data: videoMedia } = useMediaList({ type: 'VIDEO', limit: 16 });
   const { data: favorites } = useFavorites();
   const { data: continueWatching } = useContinueWatching();
   const toggleFavoriteMutation = useToggleFavorite();
 
   const [inspectingMedia, setInspectingMedia] = useState<MediaRecord | null>(null);
+  const [activeItemsList, setActiveItemsList] = useState<MediaRecord[]>([]);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
-  const favSet = new Set((favorites || []).map((f) => f.id));
+  const favSet = useMemo(() => new Set((favorites || []).map((f) => f.id)), [favorites]);
+
+  const featuredMedia = useMemo(() => {
+    if (favorites && favorites.length > 0) return favorites[0];
+    if (recentMedia && recentMedia.items.length > 0) return recentMedia.items[0];
+    return null;
+  }, [favorites, recentMedia]);
+
+  const handleOpenMedia = (media: MediaRecord, listContext: MediaRecord[] = []) => {
+    if (media.media_type === 'VIDEO') {
+      setPlayingVideoId(media.id);
+    } else {
+      setActiveItemsList(listContext.length > 0 ? listContext : [media]);
+      setInspectingMedia(media);
+    }
+  };
+
+  const continueWatchingMedia = useMemo(() => {
+    return (continueWatching || []).map((cw) => cw.media);
+  }, [continueWatching]);
 
   return (
-    <div className='space-y-8 max-w-7xl mx-auto'>
-      {/* Hero Welcome Card */}
-      <div className='relative overflow-hidden bg-gradient-to-r from-[#1A1D28] via-[#12141C] to-[#1A1D28] border border-[#232736] rounded-3xl p-8 shadow-2xl'>
-        <div className='max-w-xl space-y-3 z-10 relative'>
-          <span className='px-3 py-1 rounded-full text-xs font-semibold bg-[#2E7CF6]/20 text-[#2E7CF6] border border-[#2E7CF6]/30 inline-flex items-center gap-1.5'>
-            <Sparkles className='w-3.5 h-3.5' /> Local-First Media Vault
-          </span>
-          <h1 className='text-3xl font-extrabold text-white tracking-tight'>
-            Welcome to MEMEASY
-          </h1>
-          <p className='text-xs text-[#A0A6B8] leading-relaxed'>
-            Safe iPhone import, zero cloud dependency, SHA-256 integrity verification, and instant local playback.
-          </p>
-          <div className='flex items-center gap-3 pt-2'>
-            <Button
-              variant='primary'
-              icon={<Download className='w-4 h-4' />}
-              onClick={() => navigate('/import')}
-            >
-              Start Safe Import
-            </Button>
-            <Button
-              variant='secondary'
-              icon={<Image className='w-4 h-4' />}
-              onClick={() => navigate('/media')}
-            >
-              Browse Library
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className='space-y-10 max-w-7xl mx-auto pb-12'>
+      {/* Cinematic Hero Section */}
+      <HeroBanner
+        featuredMedia={featuredMedia}
+        totalCount={lib?.total_media_count || 0}
+        photosCount={photoMedia?.count || 0}
+        videosCount={videoMedia?.count || 0}
+        onOpenMedia={(m) => handleOpenMedia(m, recentMedia?.items || [])}
+        onBrowseLibrary={() => navigate('/media')}
+      />
 
-      {/* Metrics Grid */}
+      {/* Quick Metrics Bar */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-        <div className='p-5 bg-[#1A1D28] rounded-2xl border border-[#232736] flex items-center gap-4'>
-          <div className='p-3 rounded-xl bg-[#2E7CF6]/15 text-[#2E7CF6]'>
-            <Image className='w-6 h-6' />
+        <div className='p-4 bg-[#1A1D28]/60 rounded-2xl border border-[#232736] flex items-center gap-3.5'>
+          <div className='p-2.5 rounded-xl bg-[#2E7CF6]/15 text-[#2E7CF6]'>
+            <Image className='w-5 h-5' />
           </div>
           <div>
-            <span className='text-xs text-[#6B7280] block font-medium'>Total Media</span>
-            <span className='text-xl font-bold text-white'>
-              {lib ? lib.total_media_count : '...'}
+            <span className='text-[11px] text-[#6B7280] block font-medium uppercase tracking-wider'>Total Library</span>
+            <span className='text-lg font-bold text-white'>
+              {lib ? lib.total_media_count : '...'} items
             </span>
           </div>
         </div>
 
-        <div className='p-5 bg-[#1A1D28] rounded-2xl border border-[#232736] flex items-center gap-4'>
-          <div className='p-3 rounded-xl bg-[#00D68F]/15 text-[#00D68F]'>
-            <HardDrive className='w-6 h-6' />
+        <div className='p-4 bg-[#1A1D28]/60 rounded-2xl border border-[#232736] flex items-center gap-3.5'>
+          <div className='p-2.5 rounded-xl bg-[#00D68F]/15 text-[#00D68F]'>
+            <HardDrive className='w-5 h-5' />
           </div>
           <div>
-            <span className='text-xs text-[#6B7280] block font-medium'>Free Usable Disk</span>
-            <span className='text-xl font-bold text-white'>
+            <span className='text-[11px] text-[#6B7280] block font-medium uppercase tracking-wider'>Free Storage</span>
+            <span className='text-lg font-bold text-white'>
               {lib ? lib.formatted_usable : '...'}
             </span>
           </div>
         </div>
 
-        <div className='p-5 bg-[#1A1D28] rounded-2xl border border-[#232736] flex items-center gap-4'>
-          <div className='p-3 rounded-xl bg-[#FFB300]/15 text-[#FFB300]'>
-            <Sparkles className='w-6 h-6' />
+        <div className='p-4 bg-[#1A1D28]/60 rounded-2xl border border-[#232736] flex items-center gap-3.5'>
+          <div className='p-2.5 rounded-xl bg-[#FFB300]/15 text-[#FFB300]'>
+            <Star className='w-5 h-5 fill-[#FFB300]' />
           </div>
           <div>
-            <span className='text-xs text-[#6B7280] block font-medium'>Starred Favorites</span>
-            <span className='text-xl font-bold text-white'>{favorites?.length || 0}</span>
+            <span className='text-[11px] text-[#6B7280] block font-medium uppercase tracking-wider'>Favorites</span>
+            <span className='text-lg font-bold text-white'>{favorites?.length || 0} items</span>
           </div>
         </div>
 
-        <div className='p-5 bg-[#1A1D28] rounded-2xl border border-[#232736] flex items-center gap-4'>
-          <div className='p-3 rounded-xl bg-purple-500/15 text-purple-400'>
-            <Clock className='w-6 h-6' />
+        <div className='p-4 bg-[#1A1D28]/60 rounded-2xl border border-[#232736] flex items-center gap-3.5'>
+          <div className='p-2.5 rounded-xl bg-purple-500/15 text-purple-400'>
+            <Clock className='w-5 h-5' />
           </div>
           <div>
-            <span className='text-xs text-[#6B7280] block font-medium'>Continue Watching</span>
-            <span className='text-xl font-bold text-white'>
-              {continueWatching?.length || 0}
+            <span className='text-[11px] text-[#6B7280] block font-medium uppercase tracking-wider'>In Progress</span>
+            <span className='text-lg font-bold text-white'>
+              {continueWatching?.length || 0} videos
             </span>
           </div>
         </div>
       </div>
 
-      {/* Continue Watching Carousel */}
-      {continueWatching && continueWatching.length > 0 && (
-        <div className='space-y-4'>
-          <div className='flex items-center justify-between'>
-            <h3 className='text-base font-bold text-white flex items-center gap-2'>
-              <Play className='w-4 h-4 text-[#2E7CF6] fill-[#2E7CF6]' /> Continue Watching
-            </h3>
-          </div>
+      {/* Media Rows / Reels */}
+      <div className='space-y-8'>
+        {/* Continue Watching Row */}
+        {continueWatchingMedia.length > 0 && (
+          <MediaRow
+            title='Continue Watching'
+            icon={<Play className='w-4 h-4 fill-[#2E7CF6]' />}
+            items={continueWatchingMedia}
+            favoriteIds={favSet}
+            onToggleFavorite={(m) =>
+              toggleFavoriteMutation.mutate({
+                mediaId: m.id,
+                isFavorite: favSet.has(m.id),
+              })
+            }
+            onSelectMedia={(m) => handleOpenMedia(m, continueWatchingMedia)}
+          />
+        )}
 
-          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
-            {continueWatching.map(({ media, progress }) => (
-              <div key={media.id} className='relative space-y-2'>
-                <MediaCard
-                  media={media}
-                  isFavorite={favSet.has(media.id)}
-                  onToggleFavorite={() =>
-                    toggleFavoriteMutation.mutate({
-                      mediaId: media.id,
-                      isFavorite: favSet.has(media.id),
-                    })
-                  }
-                  onClick={() => setPlayingVideoId(media.id)}
-                />
-                {/* Progress bar underneath */}
-                <div className='w-full bg-[#1A1D28] h-1.5 rounded-full overflow-hidden'>
-                  <div
-                    className='bg-[#2E7CF6] h-full'
-                    style={{
-                      width: ((progress.position_ms / progress.duration_ms) * 100) + '%',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        {/* Recently Added Row */}
+        {recentMedia && recentMedia.items.length > 0 && (
+          <MediaRow
+            title='Recently Added'
+            icon={<Sparkles className='w-4 h-4' />}
+            items={recentMedia.items}
+            favoriteIds={favSet}
+            onToggleFavorite={(m) =>
+              toggleFavoriteMutation.mutate({
+                mediaId: m.id,
+                isFavorite: favSet.has(m.id),
+              })
+            }
+            onSelectMedia={(m) => handleOpenMedia(m, recentMedia.items)}
+            onSeeAll={() => navigate('/media')}
+          />
+        )}
 
-      {/* Recently Imported Media */}
-      <div className='space-y-4'>
-        <div className='flex items-center justify-between'>
-          <h3 className='text-base font-bold text-white'>Recently Added</h3>
-          <Button variant='ghost' size='sm' onClick={() => navigate('/media')}>
-            View All Media
-          </Button>
-        </div>
+        {/* Recent Photos Row */}
+        {photoMedia && photoMedia.items.length > 0 && (
+          <MediaRow
+            title='Photos'
+            icon={<Image className='w-4 h-4' />}
+            items={photoMedia.items}
+            favoriteIds={favSet}
+            onToggleFavorite={(m) =>
+              toggleFavoriteMutation.mutate({
+                mediaId: m.id,
+                isFavorite: favSet.has(m.id),
+              })
+            }
+            onSelectMedia={(m) => {
+              setActiveItemsList(photoMedia.items);
+              setInspectingMedia(m);
+            }}
+            onSeeAll={() => navigate('/photos')}
+          />
+        )}
 
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3'>
-          {recentMedia?.items.map((media) => (
-            <MediaCard
-              key={media.id}
-              media={media}
-              isFavorite={favSet.has(media.id)}
-              onToggleFavorite={() =>
-                toggleFavoriteMutation.mutate({
-                  mediaId: media.id,
-                  isFavorite: favSet.has(media.id),
-                })
-              }
-              onClick={() => setInspectingMedia(media)}
-            />
-          ))}
-        </div>
+        {/* Recent Videos Row */}
+        {videoMedia && videoMedia.items.length > 0 && (
+          <MediaRow
+            title='Videos & 4K Clips'
+            icon={<Video className='w-4 h-4' />}
+            items={videoMedia.items}
+            favoriteIds={favSet}
+            onToggleFavorite={(m) =>
+              toggleFavoriteMutation.mutate({
+                mediaId: m.id,
+                isFavorite: favSet.has(m.id),
+              })
+            }
+            onSelectMedia={(m) => setPlayingVideoId(m.id)}
+            onSeeAll={() => navigate('/videos')}
+          />
+        )}
+
+        {/* Starred Favorites Row */}
+        {favorites && favorites.length > 0 && (
+          <MediaRow
+            title='Favorites'
+            icon={<Star className='w-4 h-4 fill-[#FFB300] text-[#FFB300]' />}
+            items={favorites}
+            favoriteIds={favSet}
+            onToggleFavorite={(m) =>
+              toggleFavoriteMutation.mutate({
+                mediaId: m.id,
+                isFavorite: favSet.has(m.id),
+              })
+            }
+            onSelectMedia={(m) => handleOpenMedia(m, favorites)}
+            onSeeAll={() => navigate('/favorites')}
+          />
+        )}
       </div>
 
-      {/* Video Modal Player */}
+      {/* Standalone Video Modal Player */}
       {playingVideoId && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center p-8 bg-black/90 backdrop-blur-md'>
-          <div className='relative w-full max-w-5xl bg-[#12141C] rounded-2xl overflow-hidden border border-[#232736] p-4'>
-            <div className='flex justify-end mb-2'>
-              <Button variant='ghost' size='sm' onClick={() => setPlayingVideoId(null)}>
-                Close Player
-              </Button>
-            </div>
-            <VideoPlayer mediaId={playingVideoId} />
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md'>
+          <div className='relative w-full max-w-5xl bg-[#12141C] rounded-2xl overflow-hidden border border-[#232736] p-4 shadow-2xl'>
+            <VideoPlayer
+              mediaId={playingVideoId}
+              onClose={() => setPlayingVideoId(null)}
+            />
           </div>
         </div>
       )}
 
-      {/* Media Viewer Modal */}
+      {/* Media Viewer Lightbox */}
       <MediaViewer
         media={inspectingMedia}
+        itemsList={activeItemsList}
         isOpen={!!inspectingMedia}
         onClose={() => setInspectingMedia(null)}
+        onNavigate={(m) => setInspectingMedia(m)}
         isFavorite={inspectingMedia ? favSet.has(inspectingMedia.id) : false}
         onToggleFavorite={() => {
           if (inspectingMedia) {
