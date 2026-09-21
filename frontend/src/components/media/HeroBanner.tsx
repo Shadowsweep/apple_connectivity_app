@@ -45,16 +45,25 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     );
   }
 
-  const thumbUrl = mediaApi.getStreamUrl(featuredMedia.id);
+  const thumbUrl = mediaApi.getThumbnailUrl(featuredMedia.id);
   const isVideo = featuredMedia.media_type === 'VIDEO';
   const displayDate = formatDate(featuredMedia.capture_date || featuredMedia.imported_at);
 
   return (
-    <div className='relative w-full h-[360px] rounded-3xl overflow-hidden border border-[#232736] shadow-2xl group'>
+    <div className='relative w-full h-[360px] rounded-3xl overflow-hidden border border-[#232736] shadow-2xl group bg-[#12141C]'>
       {/* Background Image / Stream Preview with Vignette */}
       <img
         src={thumbUrl}
         alt={featuredMedia.filename}
+        onError={(e) => {
+          // If thumbnail fails, try stream url once, then hide on second fail
+          const stream = mediaApi.getStreamUrl(featuredMedia.id);
+          if (e.currentTarget.src !== stream) {
+            e.currentTarget.src = stream;
+          } else {
+            e.currentTarget.style.display = 'none';
+          }
+        }}
         className='absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
       />
 

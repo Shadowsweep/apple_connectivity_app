@@ -107,7 +107,7 @@ class SafeImporter:
             elif item.media_type == MediaType.LIVE_PHOTO:
                 live_photos += 1
 
-            status, existing_record = self.duplicate_detector.check_item(item, device=device)
+            status, existing_record = self.duplicate_detector.check_item(item, device=device, fast=True)
             if status == DuplicateStatus.ALREADY_IMPORTED and existing_record is not None:
                 already_imported.append((item, existing_record))
             else:

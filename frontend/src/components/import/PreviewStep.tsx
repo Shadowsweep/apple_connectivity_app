@@ -38,6 +38,24 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({
     });
   }, [preview]);
 
+  const [openMonths, setOpenMonths] = React.useState<Set<string>>(new Set());
+  const [showAllMonths, setShowAllMonths] = React.useState<Set<string>>(new Set());
+
+  React.useEffect(() => {
+    if (monthGroups.length > 0) {
+      setOpenMonths(new Set([monthGroups[0][0]]));
+    }
+  }, [monthGroups]);
+
+  const toggleMonth = (monthKey: string) => {
+    setOpenMonths((prev) => {
+      const next = new Set(prev);
+      if (next.has(monthKey)) next.delete(monthKey);
+      else next.add(monthKey);
+      return next;
+    });
+  };
+
   if (isLoading) {
     return (
       <div className='p-8 bg-[#1A1D28] rounded-2xl border border-[#232736] animate-pulse space-y-4'>
@@ -74,7 +92,7 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({
             className='text-[11px] text-(--mm-accent) hover:text-white'
             onClick={() => onSelectionChange(new Set(selectableItems.map((item) => item.id)))}
           >
-            Select all
+            Select all ({selectableItems.length})
           </button>
           <span className='text-[#3B4052]'>·</span>
           <button className='text-[11px] text-[#A0A6B8] hover:text-white' onClick={() => onSelectionChange(new Set())}>
@@ -84,19 +102,27 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({
       </div>
 
       <div className='bg-[#1A1D28] rounded-2xl border border-[#232736] overflow-hidden'>
-        {monthGroups.map(([monthKey, items], index) => {
+        {monthGroups.map(([monthKey, items]) => {
+          const isOpen = openMonths.has(monthKey);
           const selectable = items.filter((item) => !item.already_imported);
           const selectedCount = selectable.filter((item) => selectedIds.has(item.id)).length;
           const allSelected = selectable.length > 0 && selectedCount === selectable.length;
+          const isShowAll = showAllMonths.has(monthKey);
+          const displayedItems = isOpen ? (isShowAll ? items : items.slice(0, 60)) : [];
           return (
-            <details key={monthKey} open={index === 0} className='group border-b border-[#232736] last:border-b-0'>
-              <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between hover:bg-[#202431]'>
+            <div key={monthKey} className='border-b border-[#232736] last:border-b-0'>
+              <div
+                role='button'
+                tabIndex={0}
+                className='cursor-pointer px-4 py-3 flex items-center justify-between hover:bg-[#202431] transition-colors'
+                onClick={() => toggleMonth(monthKey)}
+              >
                 <div className='flex items-center gap-3'>
                   <button
                     type='button'
                     aria-label={`Select ${monthLabel(monthKey)}`}
                     onClick={(event) => {
-                      event.preventDefault();
+                      event.stopPropagation();
                       setMonthSelection(monthKey, !allSelected);
                     }}
                     className='text-(--mm-accent)'
@@ -104,50 +130,68 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({
                     {allSelected ? <CheckSquare className='w-4 h-4' /> : <Square className='w-4 h-4' />}
                   </button>
                   <div>
-                    <p className='text-xs font-semibold text-white'>{monthLabel(monthKey)}</p>
+                    <p className='text-xs font-semibold text-white flex items-center gap-2'>
+                      {monthLabel(monthKey)}
+                      <span className='text-[10px] text-[#A0A6B8] font-normal'>
+                        {isOpen ? '▾' : '▸'}
+                      </span>
+                    </p>
                     <p className='text-[10px] text-[#6B7280]'>{selectedCount} of {selectable.length} selected</p>
                   </div>
                 </div>
                 <span className='text-[11px] text-[#A0A6B8]'>{items.length} items · {formatBytes(items.reduce((sum, item) => sum + item.size_bytes, 0))}</span>
-              </summary>
-              <div className='divide-y divide-[#232736] bg-[#12141C] max-h-72 overflow-y-auto'>
-                {items.map((item) => {
-                  const checked = selectedIds.has(item.id);
-                  return (
-                    <label
-                      key={item.id}
-                      className={`px-4 py-2.5 flex items-center gap-3 ${item.already_imported ? 'opacity-50' : 'cursor-pointer hover:bg-[#1A1D28]'}`}
-                    >
-                      <input
-                        type='checkbox'
-                        className='sr-only'
-                        checked={checked}
-                        disabled={item.already_imported}
-                        onChange={() => {
-                          const next = new Set(selectedIds);
-                          if (checked) next.delete(item.id);
-                          else next.add(item.id);
-                          onSelectionChange(next);
-                        }}
-                      />
-                      <span className={checked ? 'text-(--mm-accent)' : 'text-[#4C5265]'}>
-                        {checked ? <CheckSquare className='w-4 h-4' /> : <Square className='w-4 h-4' />}
-                      </span>
-                      <span className='p-1.5 rounded-lg bg-[#202431] text-[#A0A6B8]'>
-                        {item.media_type === 'VIDEO' ? <Video className='w-3.5 h-3.5' /> : <Image className='w-3.5 h-3.5' />}
-                      </span>
-                      <span className='min-w-0 flex-1'>
-                        <span className='block text-xs text-white truncate'>{item.filename}</span>
-                        <span className='block text-[10px] text-[#6B7280]'>
-                          {item.capture_date ? new Date(item.capture_date).toLocaleDateString() : 'Date unavailable'} · {item.formatted_size}
-                        </span>
-                      </span>
-                      {item.already_imported && <span className='text-[10px] text-[#FFB300]'>Already in vault</span>}
-                    </label>
-                  );
-                })}
               </div>
-            </details>
+              {isOpen && (
+                <div className='divide-y divide-[#232736] bg-[#12141C] max-h-80 overflow-y-auto'>
+                  {displayedItems.map((item) => {
+                    const checked = selectedIds.has(item.id);
+                    return (
+                      <label
+                        key={item.id}
+                        className={`px-4 py-2.5 flex items-center gap-3 ${item.already_imported ? 'opacity-50' : 'cursor-pointer hover:bg-[#1A1D28]'}`}
+                      >
+                        <input
+                          type='checkbox'
+                          className='sr-only'
+                          checked={checked}
+                          disabled={item.already_imported}
+                          onChange={() => {
+                            const next = new Set(selectedIds);
+                            if (checked) next.delete(item.id);
+                            else next.add(item.id);
+                            onSelectionChange(next);
+                          }}
+                        />
+                        <span className={checked ? 'text-(--mm-accent)' : 'text-[#4C5265]'}>
+                          {checked ? <CheckSquare className='w-4 h-4' /> : <Square className='w-4 h-4' />}
+                        </span>
+                        <span className='p-1.5 rounded-lg bg-[#202431] text-[#A0A6B8]'>
+                          {item.media_type === 'VIDEO' ? <Video className='w-3.5 h-3.5' /> : <Image className='w-3.5 h-3.5' />}
+                        </span>
+                        <span className='min-w-0 flex-1'>
+                          <span className='block text-xs text-white truncate'>{item.filename}</span>
+                          <span className='block text-[10px] text-[#6B7280]'>
+                            {item.capture_date ? new Date(item.capture_date).toLocaleDateString() : 'Date unavailable'} · {item.formatted_size}
+                          </span>
+                        </span>
+                        {item.already_imported && <span className='text-[10px] text-[#FFB300]'>Already in vault</span>}
+                      </label>
+                    );
+                  })}
+                  {!isShowAll && items.length > 60 && (
+                    <div className='p-3 text-center bg-[#181B26]'>
+                      <button
+                        type='button'
+                        className='text-xs text-(--mm-accent) hover:underline'
+                        onClick={() => setShowAllMonths((prev) => new Set([...prev, monthKey]))}
+                      >
+                        Show all {items.length} items in {monthLabel(monthKey)}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

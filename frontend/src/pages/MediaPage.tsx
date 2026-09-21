@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useMediaList, useFavorites, useToggleFavorite, useTrashMedia, useBackfillDurations } from '../hooks/useMedia';
+import { useInfiniteMediaList, useFavorites, useToggleFavorite, useTrashMedia, useBackfillDurations } from '../hooks/useMedia';
 import { FilterToolbar } from '../components/media/FilterToolbar';
 import { SmartCollectionsBar } from '../components/media/SmartCollectionsBar';
 import { FilterBuilderModal } from '../components/media/FilterBuilderModal';
@@ -39,8 +39,14 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
   const activeType = currentFilters.mediaType || initialType || 'ALL';
   const searchQuery = currentFilters.search || '';
 
-  // Query media list with structured parameters
-  const { data: mediaList, isLoading } = useMediaList({
+  // Query media list with infinite loading for older photos
+  const {
+    data: infiniteData,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteMediaList({
     type: activeType === 'ALL' ? undefined : activeType,
     search: searchQuery || undefined,
     start_date: currentFilters.startDate,
@@ -56,8 +62,33 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
     extension: currentFilters.extension,
     favorite: currentFilters.favorite,
     sort: currentFilters.sort || 'newest',
-    limit: 150,
+    limit: 100,
   });
+
+  const mediaItems = useMemo(
+    () => infiniteData?.pages.flatMap((page) => page.items) || [],
+    [infiniteData]
+  );
+  const totalCount = infiniteData?.pages[0]?.total ?? 0;
+
+  // Infinite scroll observer to auto-fetch next page as user reaches bottom
+  const loadMoreRef = React.useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const { data: favorites } = useFavorites();
   const toggleFavoriteMutation = useToggleFavorite();
@@ -136,9 +167,11 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
         onTypeChange={handleTypeChange}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
-        totalCount={mediaList?.total !== undefined ? mediaList.total : mediaList?.count}
+        totalCount={totalCount}
         onOpenAdvancedFilters={() => setIsFilterModalOpen(true)}
         activeFilterCount={activeFilterCount}
+        currentSort={currentFilters.sort || 'newest'}
+        onSortChange={(s) => updateFilters({ ...currentFilters, sort: s as MediaFilters['sort'] })}
       />
 
       {/* Selection Toolbar */}
@@ -189,7 +222,7 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
 
       {/* Media Grid */}
       <MediaGrid
-        items={mediaList?.items || []}
+        items={mediaItems}
         favoriteIds={favSet}
         isLoading={isLoading}
         groupByMonth
@@ -207,6 +240,29 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
         onAddToFolder={(media) => setFolderTargetIds([media.id])}
       />
 
+      {/* Infinite Scroll / Load More Footer */}
+      {mediaItems.length > 0 && (
+        <div className='flex flex-col items-center justify-center py-6 gap-3 border-t border-[#232736]/40 mt-6'>
+          <span className='text-xs text-[#6B7280]'>
+            Showing {mediaItems.length.toLocaleString()} of {totalCount.toLocaleString()} items
+          </span>
+          {hasNextPage ? (
+            <Button
+              variant='secondary'
+              size='md'
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+            >
+              {isFetchingNextPage ? 'Loading older photos...' : 'Load More Older Photos'}
+            </Button>
+          ) : (
+            <span className='text-xs text-[#A0A6B8]/60'>All {totalCount.toLocaleString()} items loaded</span>
+          )}
+          {/* Sentinel for auto scroll loading */}
+          <div ref={loadMoreRef} className='h-4 w-full pointer-events-none' />
+        </div>
+      )}
+
       {/* Advanced Filter Builder Modal */}
       <FilterBuilderModal
         isOpen={isFilterModalOpen}
@@ -218,7 +274,7 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
       {/* Media Lightbox Viewer */}
       <MediaViewer
         media={inspectingMedia}
-        itemsList={mediaList?.items || []}
+        itemsList={mediaItems}
         isOpen={!!inspectingMedia}
         onClose={() => setInspectingMedia(null)}
         onNavigate={(m) => setInspectingMedia(m)}

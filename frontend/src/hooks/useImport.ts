@@ -6,7 +6,11 @@ export function useDeviceSummary() {
   return useQuery({
     queryKey: ['deviceSummary'],
     queryFn: () => importApi.getDeviceSummary(),
-    staleTime: 60000,
+    refetchInterval: (query) => {
+      const status = query.state.data?.connection_status;
+      return status === 'SCANNING' ? 1500 : false;
+    },
+    staleTime: 5000,
     // ponytail: no auto-retries — each attempt boots COM on a flaky device
     retry: false,
   });

@@ -1,0 +1,6 @@
+INFO:     Started server process [11104]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8002 (Press CTRL+C to quit)
+[2026-09-21 16:48:20] [INFO] [memeasy:imports.py:158] iphone scan provider=Direct USB (Apple Devices pairing service) items=11634 bytes=35916658881
+[2026-09-21 18:13:00] [INFO] [memeasy.device:iphone.py:975] iphone probe state=READY provider=Direct USB (Apple Devices pairing service)

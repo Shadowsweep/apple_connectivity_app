@@ -109,6 +109,12 @@ class DuplicateDetector:
         # ponytail: preview fast-path — size+filename only, zero USB/disk bytes.
         # Exact content match is confirmed once at copy time via staged hash.
         if fast:
+            exact_candidate = next(
+                (c for c in size_candidates if c.filename.lower() == item.filename.lower()),
+                None
+            )
+            if exact_candidate:
+                return DuplicateStatus.ALREADY_IMPORTED, exact_candidate
             return DuplicateStatus.NEW, None
 
         # Compute source item hash for verification against candidates.

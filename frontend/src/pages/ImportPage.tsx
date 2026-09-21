@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceSelector } from '../components/import/DeviceSelector';
 import { DeviceSummaryPanel } from '../components/import/DeviceSummaryPanel';
 import { FilterStep } from '../components/import/FilterStep';
@@ -54,7 +54,16 @@ export const ImportPage: React.FC = () => {
   const { data: currentJob } = useJobStatus(activeJobId);
 
   useEffect(() => {
-    setSelectedIds(new Set((preview?.items || []).filter((item) => !item.already_imported).map((item) => item.id)));
+    if (!preview?.items?.length) {
+      setSelectedIds(new Set());
+      return;
+    }
+    // ponytail: select non-duplicate items in the latest month by default to avoid accidental 33GB bulk imports
+    const firstMonthKey = preview.items[0]?.month_key;
+    const initialSelection = preview.items
+      .filter((item) => item.month_key === firstMonthKey && !item.already_imported)
+      .map((item) => item.id);
+    setSelectedIds(new Set(initialSelection));
   }, [preview]);
 
   const handleStartImport = async () => {
@@ -86,6 +95,30 @@ export const ImportPage: React.FC = () => {
     }
     await refetchPreview();
   };
+
+  // Refresh summary and preview whenever a background scan finishes
+  useEffect(() => {
+    if (scanStatus?.state === 'COMPLETED') {
+      refetchSummary();
+      refetchPreview();
+    }
+  }, [scanStatus?.state, refetchSummary, refetchPreview]);
+
+  // ponytail: one auto-scan per mount only when needed
+  const autoScanStarted = useRef(false);
+  useEffect(() => {
+    if (autoScanStarted.current || isSummaryLoading) return;
+    if (deviceType === 'iphone' && deviceSummary?.connection_status === 'SCANNING') return;
+    if (deviceType === 'iphone' && (!deviceSummary || deviceSummary.connection_status === 'DISCONNECTED')) {
+      if (!scanStatus || scanStatus.state === 'IDLE') {
+        autoScanStarted.current = true;
+        handleScan().catch(() => {
+          autoScanStarted.current = false;
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSummaryLoading, deviceSummary, scanStatus, deviceType]);
 
   const handleCreateFolder = () => {
     const name = window.prompt('Name the new folder inside the selected vault folder:');
@@ -131,6 +164,8 @@ export const ImportPage: React.FC = () => {
               isLoading={isSummaryLoading}
               onRefresh={handleScan}
               isRefreshing={startScanMutation.isPending || scanStatus?.state === 'SCANNING'}
+              scanState={scanStatus?.state ?? null}
+              scannedItems={scanStatus?.items_discovered ?? 0}
             />
           )}
 

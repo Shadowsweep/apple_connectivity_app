@@ -1,0 +1,516 @@
+[2m6:14:37 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m6:14:37 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:52:16 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:52:16 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:52:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:52:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:53:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:53:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:54:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:54:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:55:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:55:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:56:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:56:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:57:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:57:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:58:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:58:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:59:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m7:59:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:00:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:00:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:01:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:01:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:02:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:02:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:03:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:03:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:04:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:04:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:05:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:05:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:06:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:06:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:13:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:13:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:14:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:14:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:15:27 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:15:27 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:16:28 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:16:28 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:17:29 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:17:29 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:18:30 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:18:30 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:19:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:19:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:20:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:20:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:45:29 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m8:45:29 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:20 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:20 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/library[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/clean/status[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?limit=20[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/library[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?limit=16[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/albums[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?type=PHOTO&limit=16[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?type=VIDEO&limit=16[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/clean/status[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/favorites[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/playback/continue[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?limit=20[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?limit=16[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/albums[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?type=PHOTO&limit=16[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/media?type=VIDEO&limit=16[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/favorites[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:26 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/playback/continue[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:20:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:21:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:21:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:22:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:22:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:23:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:23:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:24:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:24:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:25:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:25:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:26:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:26:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:27:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:27:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:32:25 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:32:25 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:33:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:33:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:34:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:34:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:35:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:35:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:36:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:36:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:37:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:37:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:38:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:38:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:39:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:39:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:40:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:40:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:41:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:41:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:42:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:42:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:43:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:43:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:44:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:44:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:45:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:45:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:46:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:46:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:47:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:47:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:48:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:48:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:49:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:49:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:50:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:50:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:51:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:51:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:52:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:52:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:53:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:53:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:54:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:54:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:55:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:55:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:56:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:56:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:57:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:57:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:58:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:58:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:59:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m9:59:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:00:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:00:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:01:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:01:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:02:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:02:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:03:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:03:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:04:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:04:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:05:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:05:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:06:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:06:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:07:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:07:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:08:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:08:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:09:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:09:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:10:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:10:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:11:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:11:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:12:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:12:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:18:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+[2m10:18:31 pm[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/health[39m
+Error: connect ECONNREFUSED 127.0.0.1:8002
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)

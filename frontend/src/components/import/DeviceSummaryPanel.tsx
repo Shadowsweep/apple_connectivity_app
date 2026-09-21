@@ -8,6 +8,8 @@ interface DeviceSummaryPanelProps {
   isLoading: boolean;
   onRefresh: () => void;
   isRefreshing: boolean;
+  scanState?: string | null;
+  scannedItems?: number;
 }
 
 const SkeletonTile: React.FC = () => (
@@ -22,6 +24,8 @@ export const DeviceSummaryPanel: React.FC<DeviceSummaryPanelProps> = ({
   isLoading,
   onRefresh,
   isRefreshing,
+  scanState = null,
+  scannedItems = 0,
 }) => {
   if (isLoading) {
     return (
@@ -43,6 +47,24 @@ export const DeviceSummaryPanel: React.FC<DeviceSummaryPanelProps> = ({
         <p className='text-[11px] text-[#6B7280] flex items-center gap-2'>
           <RefreshCw className='w-3 h-3 animate-spin' /> Reading device media index over USB...
         </p>
+      </div>
+    );
+  }
+
+  // ponytail: background scan in flight but no summary yet — show live
+  // progress instead of the "No device detected" fallback.
+  if (scanState === 'SCANNING' && (!summary || !summary.is_connected || summary.connection_status !== 'READY')) {
+    return (
+      <div className='bg-[#1A1D28] rounded-2xl p-6 border border-[#232736] flex items-center gap-3'>
+        <RefreshCw className='w-5 h-5 text-(--mm-accent) animate-spin flex-shrink-0' />
+        <div className='space-y-1'>
+          <h4 className='text-sm font-semibold text-white'>
+            Scanning iPhone… {scannedItems.toLocaleString()} items
+          </h4>
+          <p className='text-xs text-[#A0A6B8]'>
+            Reading the Camera Roll over USB. Keep the phone unlocked — large libraries take ~30s.
+          </p>
+        </div>
       </div>
     );
   }

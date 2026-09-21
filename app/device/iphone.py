@@ -189,11 +189,12 @@ _AFC_MEDIA_EXTENSIONS = {
 class _AfcChunkStream(io.RawIOBase):
     """Read-only streaming wrapper around an open AFC file handle."""
 
-    def __init__(self, afc, handle: int, size: int, loop: asyncio.AbstractEventLoop):
+    def __init__(self, afc, handle: int, size: int, loop: asyncio.AbstractEventLoop, loop_lock: threading.Lock):
         self._afc = afc
         self._handle = handle
         self._remaining = size
         self._loop = loop
+        self._loop_lock = loop_lock
 
     def readable(self) -> bool:
         return True
@@ -201,16 +202,18 @@ class _AfcChunkStream(io.RawIOBase):
     def readinto(self, b) -> int:
         if self._remaining <= 0:
             return 0
-        chunk = self._loop.run_until_complete(
-            self._afc.fread(self._handle, min(len(b), self._remaining))
-        )
+        with self._loop_lock:
+            chunk = self._loop.run_until_complete(
+                self._afc.fread(self._handle, min(len(b), self._remaining))
+            )
         b[: len(chunk)] = chunk
         self._remaining -= len(chunk)
         return len(chunk)
 
     def close(self) -> None:
         try:
-            self._loop.run_until_complete(self._afc.fclose(self._handle))
+            with self._loop_lock:
+                self._loop.run_until_complete(self._afc.fclose(self._handle))
         except Exception:
             pass
         super().close()
@@ -236,6 +239,9 @@ class UsbIPhoneDevice(MediaDevice):
         self._device_name = name or "iPhone (USB)"
         self._connected = False
         self._loop: Optional[asyncio.AbstractEventLoop] = None
+        # ponytail: one loop per device is not thread-safe — concurrent API
+        # workers share the cached device, so serialize run_until_complete.
+        self._loop_lock = threading.Lock()
         self._connect()
 
     @property
@@ -243,9 +249,10 @@ class UsbIPhoneDevice(MediaDevice):
         return "Direct USB (Apple Devices pairing service)"
 
     def _run(self, coro):
-        if self._loop is None or self._loop.is_closed():
-            self._loop = asyncio.new_event_loop()
-        return self._loop.run_until_complete(coro)
+        with self._loop_lock:
+            if self._loop is None or self._loop.is_closed():
+                self._loop = asyncio.new_event_loop()
+            return self._loop.run_until_complete(coro)
 
     def _connect(self) -> None:
         try:
@@ -317,7 +324,7 @@ class UsbIPhoneDevice(MediaDevice):
             raise OSError("iPhone not connected")
         handle = self._run(self._afc.fopen(str(entry.source_path).replace("\\", "/")))
         return io.BufferedReader(
-            _AfcChunkStream(self._afc, handle, entry.size_bytes, self._loop), buffer_size=self.CHUNK_SIZE
+            _AfcChunkStream(self._afc, handle, entry.size_bytes, self._loop, self._loop_lock), buffer_size=self.CHUNK_SIZE
         )
 
     def copy_to(self, entry: DeviceMediaEntry, destination: Path) -> int:

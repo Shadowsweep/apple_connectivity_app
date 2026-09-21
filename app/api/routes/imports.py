@@ -6,7 +6,15 @@ from pydantic import BaseModel, Field
 
 from app.api.dependencies import AppContext, get_app_context
 from app.core.security import validate_safe_path
-from app.device.iphone import LocalFolderDevice, MockIPhoneDevice, get_connected_iphone, probe_connected_iphone
+from app.device.iphone import (
+    LocalFolderDevice,
+    MockIPhoneDevice,
+    _PROBE_ACTIONS,
+    _PROBE_MESSAGES,
+    _classify_afc_error,
+    get_connected_iphone,
+    probe_connected_iphone,
+)
 from app.filters.media_filter import FilterCriteria, MediaFilter
 from app.scanner.metadata import MediaType
 from app.scanner.scanner import MediaScanner
@@ -305,11 +313,51 @@ def get_scan_status(ctx: AppContext = Depends(get_app_context)):
 
 @router.get("/device-summary", response_model=DeviceSummaryResponse)
 def get_device_summary(refresh: bool = False, ctx: AppContext = Depends(get_app_context)):
-    """What's on the connected device right now. Rebuilt per request — no stale cache."""
+    """What's on the connected device right now. Rebuilt per request — non-blocking."""
     cache = ctx.active_scan_results
 
-    device, items = _scan_connected_iphone(ctx, refresh=refresh)
-    if device is None:
+    # 1. If background scan is actively running, report SCANNING immediately
+    if not refresh and cache.get("scan_state") == "SCANNING":
+        partial = cache.get("scan_partial") or {}
+        discovered = int(partial.get("discovered", 0) or 0)
+        return DeviceSummaryResponse(
+            device_name=cache.get("scan_device_id", "iPhone"),
+            is_connected=True,
+            is_real_device=True,
+            photos_count=0,
+            videos_count=0,
+            screenshots_count=0,
+            live_photos_count=0,
+            total_count=discovered,
+            total_bytes=int(partial.get("bytes", 0) or 0),
+            formatted_total=StorageManager.format_bytes(int(partial.get("bytes", 0) or 0)),
+            provider=cache.get("scan_provider"),
+            connection_status="SCANNING",
+            message="Scanning iPhone Camera Roll over USB...",
+            action="Keep your iPhone unlocked.",
+            scan_id=cache.get("scan_id"),
+            scan_generation=cache.get("scan_generation"),
+        )
+
+    # 2. Fast cache hit
+    if not refresh:
+        cached_device = cache.get("iphone_device")
+        cached_items = cache.get("iphone_items")
+        if cached_device is not None and cached_items is not None:
+            try:
+                if cached_device.is_connected:
+                    summary = _build_device_summary(cached_device, cached_items)
+                    summary.scan_id = cache.get("scan_id")
+                    summary.scan_generation = cache.get("scan_generation")
+                    return summary
+            except Exception:
+                pass
+
+    # 3. Quick probe (50ms) to avoid hanging on locked/disconnected device
+    probe = probe_connected_iphone()
+    probe_state = probe.get("state", "DISCONNECTED")
+
+    if probe_state != "READY":
         import os
         if os.getenv("USE_MOCK_IPHONE") == "1":
             mock_path = ctx.storage_manager.library_root.parent / "tests" / "fixtures" / "fake_iphone"
@@ -317,34 +365,49 @@ def get_device_summary(refresh: bool = False, ctx: AppContext = Depends(get_app_
                 from tests.fixtures.fake_iphone_generator import create_mock_iphone_fixture
                 create_mock_iphone_fixture(mock_path)
             device = MockIPhoneDevice(mock_path)
-        else:
-            summary = DeviceSummaryResponse(
-                device_name="No iPhone Detected",
-                is_connected=False,
-                is_real_device=False,
-                photos_count=0,
-                videos_count=0,
-                screenshots_count=0,
-                live_photos_count=0,
-                total_count=0,
-                total_bytes=0,
-                formatted_total="0 B",
-                provider=None,
-                connection_status="DISCONNECTED",
-                message=(
-                    "Connect and unlock the iPhone, tap Trust This Computer, and confirm it "
-                    "appears in Apple Devices or Windows Explorer before rescanning."
-                ),
-                action="Connect the iPhone with a USB cable, tap Trust, then Try Again.",
-            )
+            items = MediaScanner(device).scan()
+            summary = _build_device_summary(device, items)
+            summary.scan_id = cache.get("scan_id")
+            summary.scan_generation = cache.get("scan_generation")
             return summary
 
-    if isinstance(device, MockIPhoneDevice):
-        items = MediaScanner(device).scan()
-    summary = _build_device_summary(device, items)
-    summary.scan_id = cache.get("scan_id")
-    summary.scan_generation = cache.get("scan_generation")
-    return summary
+        return DeviceSummaryResponse(
+            device_name=probe.get("device_name") or "No iPhone Detected",
+            is_connected=probe_state in ("READY", "EMPTY"),
+            is_real_device=probe_state != "DISCONNECTED",
+            photos_count=0,
+            videos_count=0,
+            screenshots_count=0,
+            live_photos_count=0,
+            total_count=0,
+            total_bytes=0,
+            formatted_total="0 B",
+            provider=probe.get("provider"),
+            connection_status=probe_state,
+            message=probe.get("message"),
+            action=probe.get("action"),
+        )
+
+    # 4. Device is READY over USB — launch background scan without blocking the HTTP worker
+    start_device_scan(ScanStartRequest(refresh=refresh), ctx=ctx)
+    return DeviceSummaryResponse(
+        device_name=probe.get("device_name") or "iPhone",
+        is_connected=True,
+        is_real_device=True,
+        photos_count=0,
+        videos_count=0,
+        screenshots_count=0,
+        live_photos_count=0,
+        total_count=0,
+        total_bytes=0,
+        formatted_total="0 B",
+        provider=probe.get("provider"),
+        connection_status="SCANNING",
+        message="Reading Camera Roll over USB. Keep iPhone unlocked.",
+        action="Scanning in progress.",
+        scan_id=cache.get("scan_id"),
+        scan_generation=cache.get("scan_generation"),
+    )
 
 
 class ImportFilterParams(BaseModel):
@@ -406,21 +469,32 @@ def _get_device_and_filtered_items(params: ImportFilterParams, ctx: AppContext):
         device = LocalFolderDevice(src_path, name="Custom Source")
         scanned_items = MediaScanner(device).scan()
     else:
-        device, scanned_items = _scan_connected_iphone(ctx)
-        if device is None:
-            import os
-            if os.getenv("USE_MOCK_IPHONE") == "1":
-                mock_path = ctx.storage_manager.library_root.parent / "tests" / "fixtures" / "fake_iphone"
-                if not mock_path.exists():
-                    from tests.fixtures.fake_iphone_generator import create_mock_iphone_fixture
-                    create_mock_iphone_fixture(mock_path)
-                device = MockIPhoneDevice(mock_path)
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="No iPhone detected over USB. Please connect your iPhone via USB cable, unlock the screen, and tap 'Trust This Computer' if prompted.",
-                )
-            scanned_items = MediaScanner(device).scan()
+        # ponytail: same typed-failure rule as device-summary — 503 with an
+        # action, never a bare 500 (usually phone locked mid-scan).
+        try:
+            device, scanned_items = _scan_connected_iphone(ctx)
+            if device is None:
+                import os
+                if os.getenv("USE_MOCK_IPHONE") == "1":
+                    mock_path = ctx.storage_manager.library_root.parent / "tests" / "fixtures" / "fake_iphone"
+                    if not mock_path.exists():
+                        from tests.fixtures.fake_iphone_generator import create_mock_iphone_fixture
+                        create_mock_iphone_fixture(mock_path)
+                    device = MockIPhoneDevice(mock_path)
+                else:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="No iPhone detected over USB. Please connect your iPhone via USB cable, unlock the screen, and tap 'Trust This Computer' if prompted.",
+                    )
+                scanned_items = MediaScanner(device).scan()
+        except HTTPException:
+            raise
+        except Exception as exc:  # noqa: BLE001
+            state = _classify_afc_error(exc)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"{_PROBE_MESSAGES.get(state, 'iPhone unavailable.')} {_PROBE_ACTIONS.get(state, '')}".strip(),
+            )
 
     criteria = FilterCriteria(
         date_from=params.date_from,
@@ -481,12 +555,24 @@ def _destination_prefix(params: ImportFilterParams, ctx: AppContext) -> Optional
     return target.relative_to(ctx.storage_manager.library_root)
 
 
+def _preview_or_503(ctx: AppContext, filtered_items, device):
+    """Runs importer.preview; a transient USB failure mid-preview is 503 with an action, never a 500."""
+    try:
+        return ctx.importer.preview(filtered_items, device=device)
+    except Exception as exc:  # noqa: BLE001
+        state = _classify_afc_error(exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"{_PROBE_MESSAGES.get(state, 'iPhone unavailable.')} {_PROBE_ACTIONS.get(state, '')}".strip(),
+        )
+
+
 @router.post("/preview", response_model=ImportPreviewResponse)
 def get_import_preview(
     params: ImportFilterParams, ctx: AppContext = Depends(get_app_context)
 ):
     device, filtered_items = _get_device_and_filtered_items(params, ctx)
-    preview = ctx.importer.preview(filtered_items, device=device)
+    preview = _preview_or_503(ctx, filtered_items, device)
     duplicate_ids = {
         item.source_entry.unique_id
         for item, _ in preview.already_imported_items
@@ -516,7 +602,7 @@ def start_import(
     params: ImportFilterParams, ctx: AppContext = Depends(get_app_context)
 ):
     device, filtered_items = _get_device_and_filtered_items(params, ctx)
-    preview = ctx.importer.preview(filtered_items, device=device)
+    preview = _preview_or_503(ctx, filtered_items, device)
     destination_prefix = _destination_prefix(params, ctx)
 
     if not filtered_items:

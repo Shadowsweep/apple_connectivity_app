@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { mediaApi } from '../api/mediaApi';
 import { MediaFilterParams } from '../types/media';
 
@@ -6,6 +6,21 @@ export function useMediaList(params?: MediaFilterParams) {
   return useQuery({
     queryKey: ['media', params],
     queryFn: () => mediaApi.listMedia(params),
+  });
+}
+
+export function useInfiniteMediaList(params?: MediaFilterParams) {
+  return useInfiniteQuery({
+    queryKey: ['media', 'infinite', params],
+    queryFn: ({ pageParam = 1 }) =>
+      mediaApi.listMedia({ ...params, page: pageParam as number, limit: params?.limit || 100 }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const total = lastPage.total ?? 0;
+      const limit = lastPage.limit || 100;
+      const totalPages = Math.ceil(total / limit);
+      return lastPage.page < totalPages ? lastPage.page + 1 : undefined;
+    },
   });
 }
 

@@ -15,7 +15,7 @@ export interface DeviceSummary {
   oldest_capture_date: string | null;
   newest_capture_date: string | null;
   provider?: string | null;
-  connection_status: 'READY' | 'EMPTY' | 'NEEDS_ATTENTION' | 'DISCONNECTED' | 'LOCKED' | 'UNTRUSTED' | 'UNAVAILABLE';
+  connection_status: 'READY' | 'EMPTY' | 'NEEDS_ATTENTION' | 'DISCONNECTED' | 'LOCKED' | 'UNTRUSTED' | 'UNAVAILABLE' | 'SCANNING';
   message?: string | null;
   action?: string | null;
 }

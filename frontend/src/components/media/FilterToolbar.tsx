@@ -10,6 +10,8 @@ interface FilterToolbarProps {
   totalCount?: number;
   onOpenAdvancedFilters?: () => void;
   activeFilterCount?: number;
+  currentSort?: string;
+  onSortChange?: (sort: string) => void;
 }
 
 export const FilterToolbar: React.FC<FilterToolbarProps> = ({
@@ -20,6 +22,8 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
   totalCount,
   onOpenAdvancedFilters,
   activeFilterCount = 0,
+  currentSort = 'newest',
+  onSortChange,
 }) => {
   const types: { key: MediaType | 'ALL'; label: string; icon: React.ReactNode }[] = [
     { key: 'ALL', label: 'All Media', icon: <Grid className='w-4 h-4' /> },
@@ -75,8 +79,23 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
           </button>
         )}
 
+        {onSortChange && (
+          <select
+            value={currentSort}
+            onChange={(e) => onSortChange(e.target.value)}
+            className='bg-[#12141C] text-[#A0A6B8] hover:text-white border border-[#232736] rounded-xl px-2.5 py-1.5 text-xs font-medium outline-none focus:border-(--mm-accent) transition-all cursor-pointer'
+            title='Sort media items'
+          >
+            <option value='newest'>Newest First</option>
+            <option value='oldest'>Oldest First</option>
+            <option value='imported_newest'>Recently Imported</option>
+            <option value='size_desc'>Largest Files</option>
+            <option value='name_asc'>Name (A-Z)</option>
+          </select>
+        )}
+
         {totalCount !== undefined && (
-          <span className='text-xs text-[#6B7280] whitespace-nowrap'>{totalCount} items</span>
+          <span className='text-xs text-[#6B7280] whitespace-nowrap'>{totalCount.toLocaleString()} items</span>
         )}
       </div>
     </div>

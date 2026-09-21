@@ -153,6 +153,13 @@ export const MediaViewer: React.FC<MediaViewerProps> = ({
               <img
                 src={streamUrl}
                 alt={media.filename}
+                onError={(e) => {
+                  // If browser cannot decode HEIC stream, fallback to converted JPEG thumbnail
+                  const fallback = mediaApi.getThumbnailUrl(media.id);
+                  if (e.currentTarget.src !== fallback) {
+                    e.currentTarget.src = fallback;
+                  }
+                }}
                 className={'object-contain rounded-xl shadow-2xl transition-all duration-300 ' + (isZoomed ? 'max-w-none cursor-zoom-out' : 'max-w-full max-h-full cursor-zoom-in')}
                 onClick={() => setIsZoomed(!isZoomed)}
               />

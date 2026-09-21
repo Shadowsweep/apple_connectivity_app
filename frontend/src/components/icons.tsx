@@ -54,7 +54,7 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
   Activity01Icon,
-  CheckSquare as CheckSquareIcon,
+  CheckmarkSquare01Icon as CheckSquareIcon,
   Square01Icon,
   FileQuestionMarkIcon,
   DashboardBrowsingIcon,
