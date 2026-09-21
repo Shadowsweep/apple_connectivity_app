@@ -40,7 +40,7 @@ export const CreateAlbumModal: React.FC<CreateAlbumModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder='e.g., Summer Vacation 2025'
-            className='w-full px-3.5 py-2 rounded-lg bg-[#1A1D28] border border-[#232736] text-white text-sm focus:outline-none focus:border-[#2E7CF6]'
+            className='w-full px-3.5 py-2 rounded-lg bg-[#1A1D28] border border-[#232736] text-white text-sm focus:outline-none focus:border-(--mm-accent)'
           />
         </div>
 
@@ -53,7 +53,7 @@ export const CreateAlbumModal: React.FC<CreateAlbumModalProps> = ({
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
             placeholder='Short description of this collection...'
-            className='w-full px-3.5 py-2 rounded-lg bg-[#1A1D28] border border-[#232736] text-white text-sm focus:outline-none focus:border-[#2E7CF6]'
+            className='w-full px-3.5 py-2 rounded-lg bg-[#1A1D28] border border-[#232736] text-white text-sm focus:outline-none focus:border-(--mm-accent)'
           />
         </div>
 

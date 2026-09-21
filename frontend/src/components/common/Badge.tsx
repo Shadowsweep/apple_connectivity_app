@@ -15,7 +15,7 @@ export const Badge: React.FC<BadgeProps> = ({
     verified: 'bg-[#00D68F]/15 text-[#00D68F] border-[#00D68F]/30',
     warning: 'bg-[#FFB300]/15 text-[#FFB300] border-[#FFB300]/30',
     error: 'bg-[#FF3B30]/15 text-[#FF3B30] border-[#FF3B30]/30',
-    info: 'bg-[#2E7CF6]/15 text-[#2E7CF6] border-[#2E7CF6]/30',
+    info: 'bg-(--mm-accent)/15 text-(--mm-accent) border-(--mm-accent)/30',
     default: 'bg-[#232736] text-[#A0A6B8] border-[#232736]',
   }[variant];
 

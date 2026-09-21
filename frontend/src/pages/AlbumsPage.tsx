@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderHeart, Plus, Trash2 } from 'lucide-react';
+import { FolderHeart, Plus, Trash2 } from '../components/icons';
 import { useAlbums, useCreateAlbum, useDeleteAlbum } from '../hooks/useAlbums';
 import { CreateAlbumModal } from '../components/album/CreateAlbumModal';
 import { Button } from '../components/common/Button';
@@ -43,10 +43,10 @@ export const AlbumsPage: React.FC = () => {
             <div
               key={album.id}
               onClick={() => navigate('/albums/' + album.id)}
-              className='group bg-[#1A1D28] rounded-2xl p-5 border border-[#232736] hover:border-[#2E7CF6]/50 cursor-pointer transition-all space-y-3'
+              className='group bg-[#1A1D28] rounded-2xl p-5 border border-[#232736] hover:border-(--mm-accent)/50 cursor-pointer transition-all space-y-3'
             >
               <div className='flex items-center justify-between'>
-                <div className='p-3 rounded-xl bg-[#2E7CF6]/15 text-[#2E7CF6]'>
+                <div className='p-3 rounded-xl bg-(--mm-accent)/15 text-(--mm-accent)'>
                   <FolderHeart className='w-6 h-6' />
                 </div>
                 <button

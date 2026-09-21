@@ -16,7 +16,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   const clamped = Math.min(100, Math.max(0, progress));
   
   const colors = {
-    primary: 'bg-[#2E7CF6]',
+    primary: 'bg-(--mm-accent)',
     verified: 'bg-[#00D68F]',
     warning: 'bg-[#FFB300]',
   }[variant];

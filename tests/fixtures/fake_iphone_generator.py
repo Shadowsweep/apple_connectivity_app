@@ -69,8 +69,8 @@ def _create_mock_quicktime_file(path: Path, creation_dt: datetime, duration_ms: 
     ftyp_atom = struct.pack(">I4s", len(ftyp_data) + 8, b"ftyp") + ftyp_data
 
     # mvhd atom
-    # version=0, creation_time, mod_time, time_scale, duration
-    mvhd_payload = struct.pack(">BIII I", 0, creation_time, creation_time, time_scale, duration)
+    # version(1B)=0, flags(3B), creation_time(4B), mod_time(4B), time_scale(4B), duration(4B)
+    mvhd_payload = struct.pack(">B3sIIII", 0, b"\x00\x00\x00", creation_time, creation_time, time_scale, duration)
     # Pad to 108 bytes standard mvhd
     mvhd_payload += b"\x00" * (108 - len(mvhd_payload))
     mvhd_atom = struct.pack(">I4s", len(mvhd_payload) + 8, b"mvhd") + mvhd_payload

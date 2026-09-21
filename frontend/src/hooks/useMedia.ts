@@ -41,3 +41,28 @@ export function useToggleFavorite() {
     },
   });
 }
+
+export function useTrashMedia() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (mediaIds: string[]) => mediaApi.trashMedia(mediaIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
+  });
+}
+
+export function useBackfillDurations() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => mediaApi.backfillDurations(),
+    onSuccess: (res) => {
+      if (res.updated > 0) {
+        queryClient.invalidateQueries({ queryKey: ['media'] });
+      }
+    },
+  });
+}

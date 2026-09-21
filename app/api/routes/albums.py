@@ -15,7 +15,8 @@ class CreateAlbumRequest(BaseModel):
 
 
 class AddMediaToAlbumRequest(BaseModel):
-    media_id: str
+    media_id: Optional[str] = None
+    media_ids: Optional[List[str]] = None
 
 
 class AlbumDetailResponse(BaseModel):
@@ -62,14 +63,24 @@ def add_media_to_album(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Album not found",
         )
-    media = ctx.media_repo.get_by_id(req.media_id)
-    if not media:
+    # Accept a single media_id or a batch of media_ids
+    media_ids = req.media_ids or ([req.media_id] if req.media_id else [])
+    if not media_ids:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Media item not found",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="media_id or media_ids required",
         )
-    ctx.album_repo.add_media_to_album(album_id, req.media_id)
-    return {"status": "success", "album_id": album_id, "media_id": req.media_id}
+    added = []
+    for media_id in media_ids:
+        media = ctx.media_repo.get_by_id(media_id)
+        if not media:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Media item not found",
+            )
+        ctx.album_repo.add_media_to_album(album_id, media_id)
+        added.append(media_id)
+    return {"status": "success", "album_id": album_id, "media_ids": added}
 
 
 @router.delete("/{album_id}/media/{media_id}", status_code=status.HTTP_200_OK)

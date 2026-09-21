@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Grid, Image, Video, Layers, SlidersHorizontal } from 'lucide-react';
+import { Search, Grid, Image, Video, Layers, SlidersHorizontal } from '../icons';
 import { MediaType } from '../../types/media';
 
 interface FilterToolbarProps {
@@ -35,7 +35,7 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
           <button
             key={key}
             onClick={() => onTypeChange(key)}
-            className={'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ' + (currentType === key ? 'bg-[#2E7CF6] text-white shadow' : 'text-[#A0A6B8] hover:text-white hover:bg-[#1A1D28]')}
+            className={'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ' + (currentType === key ? 'bg-(--mm-accent) text-white shadow' : 'text-[#A0A6B8] hover:text-white hover:bg-[#1A1D28]')}
           >
             {icon}
             {label}
@@ -51,7 +51,7 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder='Search filename...'
-            className='w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-[#12141C] border border-[#232736] text-white placeholder-[#6B7280] focus:outline-none focus:border-[#2E7CF6]'
+            className='w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-[#12141C] border border-[#232736] text-white placeholder-[#6B7280] focus:outline-none focus:border-(--mm-accent)'
           />
         </div>
 
@@ -61,14 +61,14 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
             onClick={onOpenAdvancedFilters}
             className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
               activeFilterCount > 0
-                ? 'bg-[#2E7CF6] text-white border-[#2E7CF6]'
+                ? 'bg-(--mm-accent) text-white border-(--mm-accent)'
                 : 'bg-[#12141C] text-[#A0A6B8] hover:text-white border-[#232736]'
             }`}
           >
             <SlidersHorizontal className='w-3.5 h-3.5' />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className='w-4 h-4 rounded-full bg-white text-[#2E7CF6] text-[10px] flex items-center justify-center font-bold'>
+              <span className='w-4 h-4 rounded-full bg-white text-(--mm-accent) text-[10px] flex items-center justify-center font-bold'>
                 {activeFilterCount}
               </span>
             )}

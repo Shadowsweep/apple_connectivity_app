@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Eye, Star, FolderPlus, Trash2, Info, Play } from 'lucide-react';
+import { Eye, Star, FolderPlus, Trash2, Info, Play } from '../icons';
 import { MediaRecord } from '../../types/media';
 
 export interface ContextMenuProps {
@@ -11,6 +11,7 @@ export interface ContextMenuProps {
   onOpen: (media: MediaRecord) => void;
   onToggleFavorite: (media: MediaRecord) => void;
   onAddToAlbum: (media: MediaRecord) => void;
+  onAddToFolder?: (media: MediaRecord) => void;
   onViewDetails?: (media: MediaRecord) => void;
   onDelete?: (media: MediaRecord) => void;
 }
@@ -24,6 +25,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   onOpen,
   onToggleFavorite,
   onAddToAlbum,
+  onAddToFolder,
   onViewDetails,
   onDelete,
 }) => {
@@ -69,7 +71,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         }}
         className='w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-white hover:bg-[#1A1D28] transition-colors text-left font-medium'
       >
-        {isVideo ? <Play className='w-4 h-4 text-[#2E7CF6]' /> : <Eye className='w-4 h-4 text-[#2E7CF6]' />}
+        {isVideo ? <Play className='w-4 h-4 text-(--mm-accent)' /> : <Eye className='w-4 h-4 text-(--mm-accent)' />}
         {isVideo ? 'Play Video' : 'Open Photo'}
       </button>
 
@@ -83,6 +85,19 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         <Star className={'w-4 h-4 ' + (isFavorite ? 'text-[#FFB300] fill-[#FFB300]' : 'text-[#6B7280]')} />
         {isFavorite ? 'Remove Favorite' : 'Add to Favorites'}
       </button>
+
+      {onAddToFolder && (
+        <button
+          onClick={() => {
+            onAddToFolder(media);
+            onClose();
+          }}
+          className='w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-white hover:bg-[#1A1D28] transition-colors text-left'
+        >
+          <FolderPlus className='w-4 h-4 text-(--mm-accent)' />
+          Add to Vault Folder...
+        </button>
+      )}
 
       <button
         onClick={() => {

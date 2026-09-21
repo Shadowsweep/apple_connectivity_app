@@ -1,8 +1,10 @@
+import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from app.api.dependencies import get_app_context, init_app_context
 from app.api.routes import (
@@ -12,12 +14,14 @@ from app.api.routes import (
     diagnostics,
     duplicates,
     favorites,
+    fs,
     health,
     imports,
     jobs,
     libraries,
     media,
     playback,
+    maintenance,
     searches,
     timeline,
 )
@@ -31,6 +35,9 @@ async def lifespan(app: FastAPI):
     try:
         ctx = get_app_context()
         if ctx:
+            cached_device = ctx.active_scan_results.get("iphone_device")
+            if cached_device is not None:
+                cached_device.close()
             ctx.job_manager.shutdown()
             ctx.db.close()
     except Exception:
@@ -84,9 +91,32 @@ def create_app(
     app.include_router(jobs.router, prefix="/api")
     app.include_router(albums.router, prefix="/api")
     app.include_router(favorites.router, prefix="/api")
+    app.include_router(fs.router, prefix="/api")
     app.include_router(playback.router, prefix="/api")
+    app.include_router(maintenance.router, prefix="/api")
+
+    # Serve the built React frontend (same origin, so /api relative paths just work)
+    dist = _frontend_dist()
+    if dist:
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def spa(full_path: str):
+            candidate = dist / full_path
+            if full_path and candidate.is_file():
+                return FileResponse(candidate)
+            return FileResponse(dist / "index.html")
 
     return app
+
+
+def _frontend_dist() -> Optional[Path]:
+    # ponytail: single lookup; if the folder is missing the API still runs standalone
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        p = Path(base) / "frontend_dist"
+        if (p / "index.html").exists():
+            return p
+    p = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    return p if (p / "index.html").exists() else None
 
 
 app = create_app()

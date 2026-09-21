@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { CleanItem } from '../../types/clean';
@@ -12,7 +12,7 @@ import {
   XCircle,
   Hash,
   FileCheck,
-} from 'lucide-react';
+} from '../icons';
 
 interface CleanMobileReviewModalProps {
   isOpen: boolean;
@@ -70,7 +70,7 @@ export const CleanMobileReviewModal: React.FC<CleanMobileReviewModalProps> = ({
           {/* Device Side */}
           <div className="p-3.5 bg-[#1A1D28] border border-[#232736] rounded-xl space-y-2">
             <div className="flex items-center gap-2 text-xs font-semibold text-[#A0A6B8]">
-              <Smartphone className="w-4 h-4 text-[#2E7CF6]" />
+              <Smartphone className="w-4 h-4 text-(--mm-accent)" />
               <span>Mobile Device File</span>
             </div>
             <div className="space-y-1 text-xs">
@@ -118,7 +118,7 @@ export const CleanMobileReviewModal: React.FC<CleanMobileReviewModalProps> = ({
         {/* Verification Checkpoints */}
         <div className="p-4 bg-[#1A1D28] border border-[#232736] rounded-xl space-y-3">
           <h5 className="text-xs font-semibold text-white flex items-center gap-2">
-            <FileCheck className="w-4 h-4 text-[#2E7CF6]" /> Multi-Tier Verification Gates
+            <FileCheck className="w-4 h-4 text-(--mm-accent)" /> Multi-Tier Verification Gates
           </h5>
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between">

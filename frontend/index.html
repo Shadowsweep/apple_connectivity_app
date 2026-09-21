@@ -6,8 +6,16 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>MEMEASY — Media Vault</title>
   </head>
-  <body class='bg-[#090A0F] text-white antialiased selection:bg-[#2E7CF6] selection:text-white'>
-    <div id='root'></div>
+  <body class='bg-[#090A0F] text-white antialiased selection:bg-(--mm-accent) selection:text-white'>
+    <script>
+      try {
+        var a = JSON.parse(localStorage.getItem('mm-accent') || 'null');
+        if (a && a.accent) {
+          document.documentElement.style.setProperty('--mm-accent', a.accent);
+          document.documentElement.style.setProperty('--mm-accent-hover', a.hover || a.accent);
+        }
+      } catch (e) {}
+    </script>    <div id='root'></div>
     <script type='module' src='/src/main.tsx'></script>
   </body>
 </html>

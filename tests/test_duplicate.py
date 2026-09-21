@@ -63,3 +63,18 @@ def test_name_collision_different_content(mock_iphone_dir: Path, tmp_path: Path)
 
     status, record = detector.check_item(item_map["IMG_1001.JPG"])
     assert status == DuplicateStatus.NAME_COLLISION
+
+
+def test_custom_prefix_duplicate_survives_restart(mock_iphone_dir: Path, tmp_path: Path):
+    # ponytail: regression for vault subfolders like Trips/Photos/2026/09
+    lib_path = tmp_path / "lib"
+    custom_dir = lib_path / "Trips" / "Photos" / "2026" / "09"
+    custom_dir.mkdir(parents=True, exist_ok=True)
+    source = mock_iphone_dir / "DCIM" / "100APPLE" / "IMG_1001.JPG"
+    (custom_dir / "IMG_1001.JPG").write_bytes(source.read_bytes())
+
+    device = MockIPhoneDevice(mock_iphone_dir)
+    items = {it.filename: it for it in MediaScanner(device).scan()}
+    # fresh instance = app restart, must still find custom-prefix copy
+    status, _ = DuplicateDetector(lib_path).check_item(items["IMG_1001.JPG"])
+    assert status == DuplicateStatus.ALREADY_IMPORTED

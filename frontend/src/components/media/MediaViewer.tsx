@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { X, Star, Calendar, HardDrive, Hash, Maximize2, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { X, Star, Calendar, HardDrive, Hash, Maximize2, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from '../icons';
 import { MediaRecord } from '../../types/media';
 import { mediaApi } from '../../api/mediaApi';
 import { VideoPlayer } from '../player/VideoPlayer';
@@ -45,12 +45,13 @@ export const MediaViewer: React.FC<MediaViewerProps> = ({
     }
   }, [hasNext, currentIndex, itemsList, onNavigate]);
 
-  // Keyboard navigation
+  // Keyboard navigation (skip Escape while in fullscreen — browser exits fullscreen first)
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (document.fullscreenElement) return;
         onClose();
       } else if (e.key === 'ArrowLeft') {
         navigatePrev();
@@ -64,6 +65,17 @@ export const MediaViewer: React.FC<MediaViewerProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose, navigatePrev, navigateNext, onToggleFavorite]);
+
+  // Browser Back closes the viewer instead of navigating away
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  useEffect(() => {
+    if (!isOpen) return;
+    window.history.pushState({ mmOverlay: 'viewer' }, '');
+    const onPop = () => onCloseRef.current();
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [isOpen]);
 
   if (!isOpen || !media) return null;
 
@@ -168,16 +180,16 @@ export const MediaViewer: React.FC<MediaViewerProps> = ({
           </h4>
           <div className='space-y-3 text-xs'>
             <div className='flex items-center gap-2.5 text-[#A0A6B8]'>
-              <HardDrive className='w-4 h-4 text-[#2E7CF6]' />
+              <HardDrive className='w-4 h-4 text-(--mm-accent)' />
               <span>{formatBytes(media.size_bytes)}</span>
             </div>
             <div className='flex items-center gap-2.5 text-[#A0A6B8]'>
-              <Calendar className='w-4 h-4 text-[#2E7CF6]' />
+              <Calendar className='w-4 h-4 text-(--mm-accent)' />
               <span>{formatDate(media.capture_date || media.imported_at)}</span>
             </div>
             {media.width && media.height && (
               <div className='flex items-center gap-2.5 text-[#A0A6B8]'>
-                <Maximize2 className='w-4 h-4 text-[#2E7CF6]' />
+                <Maximize2 className='w-4 h-4 text-(--mm-accent)' />
                 <span>{media.width + ' x ' + media.height + ' px'}</span>
               </div>
             )}

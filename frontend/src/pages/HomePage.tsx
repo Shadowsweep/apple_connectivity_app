@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Image, Video, Sparkles, Star, Play, Clock, HardDrive } from 'lucide-react';
+import { Image, Video, Sparkles, Star, Play, Clock, HardDrive, X } from '../components/icons';
 import { useLibraryInfo } from '../hooks/useLibrary';
 import { useMediaList, useFavorites, useToggleFavorite } from '../hooks/useMedia';
 import { useContinueWatching } from '../hooks/usePlayback';
@@ -24,6 +24,15 @@ export const HomePage: React.FC = () => {
   const [inspectingMedia, setInspectingMedia] = useState<MediaRecord | null>(null);
   const [activeItemsList, setActiveItemsList] = useState<MediaRecord[]>([]);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
+  // Browser Back closes the video modal instead of navigating away
+  React.useEffect(() => {
+    if (!playingVideoId) return;
+    window.history.pushState({ mmOverlay: 'video' }, '');
+    const onPop = () => setPlayingVideoId(null);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [playingVideoId]);
 
   const favSet = useMemo(() => new Set((favorites || []).map((f) => f.id)), [favorites]);
 
@@ -61,7 +70,7 @@ export const HomePage: React.FC = () => {
       {/* Quick Metrics Bar */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         <div className='p-4 bg-[#1A1D28]/60 rounded-2xl border border-[#232736] flex items-center gap-3.5'>
-          <div className='p-2.5 rounded-xl bg-[#2E7CF6]/15 text-[#2E7CF6]'>
+          <div className='p-2.5 rounded-xl bg-(--mm-accent)/15 text-(--mm-accent)'>
             <Image className='w-5 h-5' />
           </div>
           <div>
@@ -113,7 +122,7 @@ export const HomePage: React.FC = () => {
         {continueWatchingMedia.length > 0 && (
           <MediaRow
             title='Continue Watching'
-            icon={<Play className='w-4 h-4 fill-[#2E7CF6]' />}
+            icon={<Play className='w-4 h-4 fill-(--mm-accent)' />}
             items={continueWatchingMedia}
             favoriteIds={favSet}
             onToggleFavorite={(m) =>
@@ -204,8 +213,21 @@ export const HomePage: React.FC = () => {
 
       {/* Standalone Video Modal Player */}
       {playingVideoId && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md'>
-          <div className='relative w-full max-w-5xl bg-[#12141C] rounded-2xl overflow-hidden border border-[#232736] p-4 shadow-2xl'>
+        <div
+          className='fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md'
+          onClick={() => setPlayingVideoId(null)}
+        >
+          <div
+            className='relative w-full max-w-5xl bg-[#12141C] rounded-2xl overflow-hidden border border-[#232736] p-4 shadow-2xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setPlayingVideoId(null)}
+              title='Close (Esc)'
+              className='absolute top-3 right-3 z-20 p-2 rounded-xl bg-black/60 text-white/80 hover:text-white hover:bg-black/90 transition-colors'
+            >
+              <X className='w-4 h-4' />
+            </button>
             <VideoPlayer
               mediaId={playingVideoId}
               onClose={() => setPlayingVideoId(null)}

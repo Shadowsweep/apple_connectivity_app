@@ -19,6 +19,7 @@ class FilterCriteria(BaseModel):
     min_video_size_bytes: Optional[int] = None
     max_video_size_bytes: Optional[int] = None
     max_total_import_bytes: Optional[int] = None
+    limit: Optional[int] = None
 
 
 @dataclass
@@ -50,6 +51,11 @@ class MediaFilter:
         current_cumulative_bytes = 0
 
         for item in items:
+            # 0. Batch limit check
+            if self.criteria.limit and len(result.accepted) >= self.criteria.limit:
+                result.rejected.append((item, f"Exceeds batch limit of {self.criteria.limit} items"))
+                continue
+
             # 1. Type filter
             if item.media_type not in self.criteria.allowed_types:
                 result.rejected.append((item, f"Media type {item.media_type.value} not selected"))

@@ -6,14 +6,14 @@ import { useAlbums } from '../../hooks/useAlbums';
 interface AddToAlbumModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mediaId: string;
+  mediaIds: string[];
   onAdd: (albumId: string) => void;
 }
 
 export const AddToAlbumModal: React.FC<AddToAlbumModalProps> = ({
   isOpen,
   onClose,
-  mediaId,
+  mediaIds,
   onAdd,
 }) => {
   const { data: albums } = useAlbums();
@@ -29,6 +29,9 @@ export const AddToAlbumModal: React.FC<AddToAlbumModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title='Add to Album'>
       <form onSubmit={handleSubmit} className='space-y-4'>
+        <p className='text-xs text-[#A0A6B8]'>
+          Adding {mediaIds.length} {mediaIds.length === 1 ? 'item' : 'items'} to an album.
+        </p>
         <div>
           <label className='block text-xs font-medium text-[#A0A6B8] mb-2'>
             Select Destination Album
@@ -38,7 +41,7 @@ export const AddToAlbumModal: React.FC<AddToAlbumModalProps> = ({
               {albums.map((album) => {
                 const isSelected = selectedAlbumId === album.id;
                 const rowClass = isSelected
-                  ? 'bg-[#2E7CF6]/15 border-[#2E7CF6] text-white'
+                  ? 'bg-(--mm-accent)/15 border-(--mm-accent) text-white'
                   : 'bg-[#1A1D28] border-[#232736] text-[#A0A6B8] hover:text-white';
                 return (
                   <label
@@ -52,7 +55,7 @@ export const AddToAlbumModal: React.FC<AddToAlbumModalProps> = ({
                         value={album.id}
                         checked={isSelected}
                         onChange={() => setSelectedAlbumId(album.id)}
-                        className='text-[#2E7CF6] focus:ring-0'
+                        className='text-(--mm-accent) focus:ring-0'
                       />
                       <span className='text-sm font-medium'>{album.name}</span>
                     </div>

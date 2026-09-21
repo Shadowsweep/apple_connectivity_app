@@ -1,12 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useMediaList, useFavorites, useToggleFavorite } from '../hooks/useMedia';
+import { useMediaList, useFavorites, useToggleFavorite, useTrashMedia, useBackfillDurations } from '../hooks/useMedia';
 import { FilterToolbar } from '../components/media/FilterToolbar';
 import { SmartCollectionsBar } from '../components/media/SmartCollectionsBar';
 import { FilterBuilderModal } from '../components/media/FilterBuilderModal';
 import { MediaGrid } from '../components/media/MediaGrid';
 import { MediaViewer } from '../components/media/MediaViewer';
 import { AddToAlbumModal } from '../components/album/AddToAlbumModal';
+import { AddToFolderModal } from '../components/media/AddToFolderModal';
+import { Button } from '../components/common/Button';
+import { FolderPlus, Folder, X, Trash2, CheckSquare } from '../components/icons';
 import { useAddToAlbum } from '../hooks/useAlbums';
 import { MediaType, MediaRecord } from '../types/media';
 import { MediaFilters, filtersToParams, paramsToFilters } from '../types/filters';
@@ -19,7 +22,10 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [inspectingMedia, setInspectingMedia] = useState<MediaRecord | null>(null);
-  const [selectedMediaForAlbum, setSelectedMediaForAlbum] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [albumTargetIds, setAlbumTargetIds] = useState<string[] | null>(null);
+  const [folderTargetIds, setFolderTargetIds] = useState<string[] | null>(null);
 
   // Parse filters from URL
   const currentFilters: MediaFilters = useMemo(() => {
@@ -56,8 +62,38 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
   const { data: favorites } = useFavorites();
   const toggleFavoriteMutation = useToggleFavorite();
   const addToAlbumMutation = useAddToAlbum();
+  const trashMutation = useTrashMedia();
+  const backfillMutation = useBackfillDurations();
+
+  // One-shot: fill in missing video durations so cards don't show blank badges
+  useEffect(() => {
+    backfillMutation.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const favSet = useMemo(() => new Set((favorites || []).map((f) => f.id)), [favorites]);
+
+  const toggleSelect = (id: string, selected: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (selected) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setIsSelecting(false);
+  };
+
+  const handleBatchTrash = () => {
+    if (selectedIds.size === 0) return;
+    trashMutation.mutate(Array.from(selectedIds), { onSuccess: clearSelection });
+  };
 
   const updateFilters = (newFilters: MediaFilters) => {
     const p = filtersToParams(newFilters);
@@ -105,11 +141,58 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
         activeFilterCount={activeFilterCount}
       />
 
+      {/* Selection Toolbar */}
+      {selectedIds.size > 0 ? (
+        <div className='flex items-center justify-between px-4 py-2.5 rounded-xl bg-(--mm-accent)/10 border border-(--mm-accent)/40'>
+          <span className='text-sm font-semibold text-white'>
+            {selectedIds.size} selected
+          </span>
+          <div className='flex items-center gap-2'>
+            <Button
+              variant='primary'
+              size='sm'
+              icon={<Folder className='w-3.5 h-3.5' />}
+              onClick={() => setFolderTargetIds(Array.from(selectedIds))}
+            >
+              Add to Folder
+            </Button>
+            <Button
+              variant='secondary'
+              size='sm'
+              icon={<FolderPlus className='w-3.5 h-3.5' />}
+              onClick={() => setAlbumTargetIds(Array.from(selectedIds))}
+              disabled={addToAlbumMutation.isPending}
+            >
+              Add to Album
+            </Button>
+            <Button
+              variant='secondary'
+              size='sm'
+              icon={<Trash2 className='w-3.5 h-3.5' />}
+              onClick={handleBatchTrash}
+              disabled={trashMutation.isPending}
+            >
+              Move to Trash
+            </Button>
+            <Button variant='secondary' size='sm' icon={<X className='w-3.5 h-3.5' />} onClick={clearSelection}>
+              Clear
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className='flex justify-end'>
+          <Button variant='secondary' size='sm' icon={<CheckSquare className='w-3.5 h-3.5' />} onClick={() => setIsSelecting(true)}>
+            Select
+          </Button>
+        </div>
+      )}
+
       {/* Media Grid */}
       <MediaGrid
         items={mediaList?.items || []}
         favoriteIds={favSet}
         isLoading={isLoading}
+        groupByMonth
         onToggleFavorite={(media) =>
           toggleFavoriteMutation.mutate({
             mediaId: media.id,
@@ -117,6 +200,11 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
           })
         }
         onSelectMedia={(media) => setInspectingMedia(media)}
+        selectedIds={selectedIds}
+        onToggleSelect={toggleSelect}
+        showSelect={isSelecting || selectedIds.size > 0}
+        onAddToAlbum={(media) => setAlbumTargetIds([media.id])}
+        onAddToFolder={(media) => setFolderTargetIds([media.id])}
       />
 
       {/* Advanced Filter Builder Modal */}
@@ -145,15 +233,26 @@ export const MediaPage: React.FC<MediaPageProps> = ({ initialType = 'ALL' }) => 
         }}
       />
 
-      {/* Add To Album Modal */}
-      {selectedMediaForAlbum && (
+      {/* Add To Album Modal (single via context menu, or batch via selection) */}
+      {albumTargetIds && albumTargetIds.length > 0 && (
         <AddToAlbumModal
-          isOpen={!!selectedMediaForAlbum}
-          mediaId={selectedMediaForAlbum}
-          onClose={() => setSelectedMediaForAlbum(null)}
+          isOpen={!!albumTargetIds}
+          mediaIds={albumTargetIds}
+          onClose={() => setAlbumTargetIds(null)}
           onAdd={(albumId) => {
-            addToAlbumMutation.mutate({ albumId, mediaId: selectedMediaForAlbum });
+            addToAlbumMutation.mutate({ albumId, mediaIds: albumTargetIds });
+            clearSelection();
           }}
+        />
+      )}
+
+      {/* Add To Vault Folder Modal (move/copy to folder inside vault) */}
+      {folderTargetIds && folderTargetIds.length > 0 && (
+        <AddToFolderModal
+          isOpen={!!folderTargetIds}
+          mediaIds={folderTargetIds}
+          onClose={() => setFolderTargetIds(null)}
+          onSuccess={clearSelection}
         />
       )}
     </div>

@@ -22,6 +22,9 @@ class LocalMediaRecord:
     hash_sha256: Optional[str] = None
 
 
+Tuple_Result = tuple[DuplicateStatus, Optional[LocalMediaRecord]]
+
+
 class DuplicateDetector:
     """Two-tier duplicate & already-imported media detector."""
 
@@ -34,6 +37,14 @@ class DuplicateDetector:
         self.filename_index: Dict[str, List[LocalMediaRecord]] = {}
         self.hash_index: Dict[str, LocalMediaRecord] = {}
         self._indexed = False
+
+    @classmethod
+    def calculate_stream_hash(cls, stream) -> str:
+        """Computes SHA-256 hash from a readable binary stream."""
+        hasher = hashlib.sha256()
+        while chunk := stream.read(cls.CHUNK_SIZE):
+            hasher.update(chunk)
+        return hasher.hexdigest()
 
     @classmethod
     def calculate_file_hash(cls, file_path: Path) -> str:
@@ -54,32 +65,35 @@ class DuplicateDetector:
             self._indexed = True
             return
 
-        # Traverse Photos/, Videos/, Screenshots/, LivePhotos/
-        target_dirs = ["Photos", "Videos", "Screenshots", "LivePhotos"]
-        for tdir in target_dirs:
-            dir_path = self.library_root / tdir
-            if not dir_path.exists():
+        # Imports may live under a user-selected vault prefix such as
+        # Trips/Photos/2026/09, so index the whole vault rather than only the
+        # four legacy top-level folders.
+        media_extensions = {
+            ".jpg", ".jpeg", ".heic", ".png", ".gif", ".webp", ".tif", ".tiff", ".dng",
+            ".mov", ".mp4", ".m4v", ".avi", ".mkv", ".3gp",
+        }
+        for p in self.library_root.rglob("*"):
+            if not p.is_file() or p.name.startswith(".") or p.suffix.lower() not in media_extensions:
                 continue
-
-            for p in dir_path.rglob("*"):
-                if p.is_file() and not p.name.startswith("."):
-                    try:
-                        sz = p.stat().st_size
-                        rel = p.relative_to(self.library_root)
-                        record = LocalMediaRecord(
-                            relative_path=rel,
-                            absolute_path=p,
-                            size_bytes=sz,
-                            filename=p.name,
-                        )
-                        self.size_index.setdefault(sz, []).append(record)
-                        self.filename_index.setdefault(p.name.lower(), []).append(record)
-                    except OSError:
-                        continue
+            try:
+                rel = p.relative_to(self.library_root)
+                if any(part.startswith(".") for part in rel.parts) or "Thumbnails" in rel.parts:
+                    continue
+                sz = p.stat().st_size
+                record = LocalMediaRecord(
+                    relative_path=rel,
+                    absolute_path=p,
+                    size_bytes=sz,
+                    filename=p.name,
+                )
+                self.size_index.setdefault(sz, []).append(record)
+                self.filename_index.setdefault(p.name.lower(), []).append(record)
+            except OSError:
+                continue
 
         self._indexed = True
 
-    def check_item(self, item: MediaItem) -> Tuple_Result:
+    def check_item(self, item: MediaItem, device=None, fast: bool = False) -> Tuple_Result:
         """Evaluates an item against the existing library. Computes hash ONLY if candidates exist."""
         if not self._indexed:
             self.index_library()
@@ -92,9 +106,27 @@ class DuplicateDetector:
         if not size_candidates and not name_candidates:
             return DuplicateStatus.NEW, None
 
-        # Compute source item hash for verification against candidates
+        # ponytail: preview fast-path — size+filename only, zero USB/disk bytes.
+        # Exact content match is confirmed once at copy time via staged hash.
+        if fast:
+            return DuplicateStatus.NEW, None
+
+        # Compute source item hash for verification against candidates.
+        # Device entries (e.g. iPhone over AFC) are virtual paths — stream via the device.
         if not item.hash_sha256 and item.source_entry:
-            item.hash_sha256 = self.calculate_file_hash(item.source_entry.source_path)
+            source_path = item.source_entry.source_path
+            if source_path.exists():
+                item.hash_sha256 = self.calculate_file_hash(source_path)
+            elif device is not None:
+                stream = device.open_stream(item.source_entry)
+                try:
+                    item.hash_sha256 = self.calculate_stream_hash(stream)
+                finally:
+                    stream.close()
+            else:
+                raise FileNotFoundError(
+                    f"Cannot hash device item '{item.filename}' without a device provider"
+                )
 
         # Check for exact content match (Already Imported)
         for cand in size_candidates:
@@ -116,6 +148,14 @@ class DuplicateDetector:
 
         return DuplicateStatus.NEW, None
 
+    def lookup_by_hash(self, staged_hash: str) -> Optional[LocalMediaRecord]:
+        """Exact content lookup after staged hash is known (copy-time dedup)."""
+        if not staged_hash:
+            return None
+        if not self._indexed:
+            self.index_library()
+        return self.hash_index.get(staged_hash)
+
     def register_imported(self, item: MediaItem, final_rel_path: Path):
         """Register newly imported item into active duplicate index."""
         abs_path = self.library_root / final_rel_path
@@ -131,5 +171,3 @@ class DuplicateDetector:
         if item.hash_sha256:
             self.hash_index[item.hash_sha256] = record
 
-
-Tuple_Result = tuple[DuplicateStatus, Optional[LocalMediaRecord]]

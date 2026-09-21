@@ -35,8 +35,14 @@ def build_backend():
         '--hidden-import', 'PIL',
         '--hidden-import', 'PIL.Image',
         '--hidden-import', 'PIL.ExifTags',
+        '--hidden-import', 'pillow_heif',
+        '--collect-all', 'pillow_heif',
+        '--collect-all', 'imageio_ffmpeg',
         '--hidden-import', 'sqlite3',
         '--hidden-import', 'pydantic',
+        '--hidden-import', 'pythoncom',
+        '--hidden-import', 'pywintypes',
+        '--hidden-import', 'win32com.client',
         '--hidden-import', 'app',
         '--hidden-import', 'app.api',
         '--hidden-import', 'app.api.main',
@@ -67,6 +73,7 @@ def build_backend():
         '--hidden-import', 'app.api.routes.playback',
         '--collect-all', 'app',
         '--add-data', f"{str(ROOT_DIR / 'app' / 'database' / 'migrations')}{os.pathsep}app/database/migrations",
+        '--add-data', f"{str(ROOT_DIR / 'frontend' / 'dist')}{os.pathsep}frontend_dist",
         str(ROOT_DIR / 'main.py')
     ]
 

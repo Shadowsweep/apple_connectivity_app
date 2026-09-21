@@ -2,7 +2,7 @@ import hashlib
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from app.database.connection import DatabaseConnection
 from app.database.models import MediaRecord, utc_now

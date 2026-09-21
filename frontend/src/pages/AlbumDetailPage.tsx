@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, FolderHeart } from 'lucide-react';
+import { ArrowLeft, Trash2, FolderHeart } from '../components/icons';
 import { useAlbum, useRemoveFromAlbum } from '../hooks/useAlbums';
 import { useFavorites, useToggleFavorite } from '../hooks/useMedia';
 import { MediaGrid } from '../components/media/MediaGrid';
@@ -57,6 +57,7 @@ export const AlbumDetailPage: React.FC = () => {
       <MediaGrid
         items={albumDetail.items}
         favoriteIds={favSet}
+        groupByMonth
         onToggleFavorite={(media) =>
           toggleFavoriteMutation.mutate({
             mediaId: media.id,

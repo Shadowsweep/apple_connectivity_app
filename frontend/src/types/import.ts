@@ -6,6 +6,21 @@ export interface ImportFilterParams {
   min_video_size_bytes?: number;
   max_video_size_bytes?: number;
   max_total_import_bytes?: number;
+  limit?: number;
+  selected_ids?: string[];
+  target_folder?: string;
+  group_name?: string;
+}
+
+export interface ImportMediaItem {
+  id: string;
+  filename: string;
+  media_type: 'PHOTO' | 'VIDEO' | 'SCREENSHOT' | 'LIVE_PHOTO' | 'OTHER';
+  size_bytes: number;
+  formatted_size: string;
+  capture_date?: string | null;
+  month_key: string;
+  already_imported: boolean;
 }
 
 export interface ImportPreviewResponse {
@@ -22,6 +37,7 @@ export interface ImportPreviewResponse {
   usable_bytes: number;
   safety_reserve_bytes: number;
   can_fit: boolean;
+  items: ImportMediaItem[];
 }
 
 export type JobStatus = 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';

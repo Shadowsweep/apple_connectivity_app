@@ -104,3 +104,14 @@
 - [x] Single-command master build orchestration (`build_release.py`) combining pytest suite, Vite compile, and PyInstaller bundling
 - [x] Version synchronization to `1.0.0` across all descriptors (`Cargo.toml`, `tauri.conf.json`, `package.json`, `pyproject.toml`, `app/__init__.py`)
 
+## Phase 12: Media Grid UX Improvements (Completed)
+- [x] Correct video duration badges (hours support `h:mm:ss`, badge hidden instead of misleading `0:00` when duration unknown)
+- [x] One-shot duration backfill on library open (`POST /api/media/backfill-durations` parses MP4/QuickTime `mvhd` headers for videos missing duration)
+- [x] Month section grouping in media grids (`MediaGrid` `groupByMonth` prop — "September 2026 · N" headers from `capture_date`/`imported_at` fallback) on Library, Favorites, and Album detail views
+- [x] Multi-select mode in Library (`Select` button, per-card checkboxes, accent ring highlight, `N selected` action bar)
+- [x] Batch actions from selection: "Add to Album" (grouped selection into album folders) and "Move to Trash" (`POST /api/media/trash` batch soft-delete)
+- [x] Batch album add API (`POST /api/albums/{id}/media` accepts `media_ids[]` list, backward compatible with single `media_id`)
+- [x] Per-thumbnail circular loading spinner on every media card (no more confusing blank squares while images decode)
+- [x] Async thumbnail decoding (`decoding='async'` + `loading='lazy'`) for faster grid rendering
+
+

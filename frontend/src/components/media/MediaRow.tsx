@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight } from '../icons';
 import { MediaRecord } from '../../types/media';
 import { MediaCard } from './MediaCard';
 
@@ -37,14 +37,14 @@ export const MediaRow: React.FC<MediaRowProps> = ({
       {/* Header Row */}
       <div className='flex items-center justify-between px-1'>
         <h3 className='text-base font-bold text-white flex items-center gap-2'>
-          {icon && <span className='text-[#2E7CF6]'>{icon}</span>}
+          {icon && <span className='text-(--mm-accent)'>{icon}</span>}
           {title}
         </h3>
 
         {onSeeAll && (
           <button
             onClick={onSeeAll}
-            className='text-xs font-semibold text-[#A0A6B8] hover:text-[#2E7CF6] flex items-center gap-1 transition-colors'
+            className='text-xs font-semibold text-[#A0A6B8] hover:text-(--mm-accent) flex items-center gap-1 transition-colors'
           >
             See All <ArrowRight className='w-3.5 h-3.5' />
           </button>

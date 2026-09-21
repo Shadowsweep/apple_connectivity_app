@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Trash2, CheckCircle, RefreshCw, AlertTriangle, ShieldCheck, HardDrive } from 'lucide-react';
+import { Copy, Trash2, CheckCircle, RefreshCw, AlertTriangle, ShieldCheck, HardDrive } from '../components/icons';
 import { useDuplicates, useTrashDuplicates, useScanDuplicates } from '../hooks/useDuplicates';
 import { formatBytes, formatDate } from '../utils/formatters';
 import { Button } from '../components/common/Button';
@@ -54,7 +54,7 @@ export const DuplicatesPage: React.FC = () => {
       <div className='flex items-center justify-between pb-4 border-b border-[#232736]'>
         <div>
           <h2 className='text-xl font-bold text-white flex items-center gap-2'>
-            <Copy className='w-5 h-5 text-[#2E7CF6]' /> Duplicate Intelligence & Review
+            <Copy className='w-5 h-5 text-(--mm-accent)' /> Duplicate Intelligence & Review
           </h2>
           <p className='text-xs text-[#A0A6B8]'>
             Exact cryptographic SHA-256 matches. Review copies safely before moving redundant files to Trash.
@@ -121,7 +121,7 @@ export const DuplicatesPage: React.FC = () => {
                 {/* Group Sub-Header */}
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
-                    <span className='px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-[#2E7CF6]/20 text-[#2E7CF6] border border-[#2E7CF6]/30'>
+                    <span className='px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-(--mm-accent)/20 text-(--mm-accent) border border-(--mm-accent)/30'>
                       Group #{gIdx + 1}
                     </span>
                     <span className='text-xs font-bold text-white'>
@@ -146,8 +146,8 @@ export const DuplicatesPage: React.FC = () => {
                         onClick={() => handleKeepSelect(group.hash_sha256, item.id)}
                         className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-3 relative ${
                           isKept
-                            ? 'bg-[#2E7CF6]/10 border-[#2E7CF6] shadow-md shadow-[#2E7CF6]/10'
-                            : 'bg-[#12141C] border-[#232736] hover:border-[#3A3F55] opacity-75 hover:opacity-100'
+                            ? 'bg-(--mm-accent)/10 border-(--mm-accent) shadow-md shadow-(--mm-accent)/10'
+                            : 'bg-[#12141C] border-[#232736] hover:border-[#30354A] opacity-75 hover:opacity-100'
                         }`}
                       >
                         {/* Radio Selection Badge */}
@@ -158,9 +158,9 @@ export const DuplicatesPage: React.FC = () => {
                               name={`group-${group.hash_sha256}`}
                               checked={isKept}
                               onChange={() => handleKeepSelect(group.hash_sha256, item.id)}
-                              className='text-[#2E7CF6] focus:ring-0'
+                              className='text-(--mm-accent) focus:ring-0'
                             />
-                            <span className={isKept ? 'text-[#2E7CF6]' : 'text-[#6B7280]'}>
+                            <span className={isKept ? 'text-(--mm-accent)' : 'text-[#6B7280]'}>
                               {isKept ? '✓ Keep this copy' : 'Mark to trash'}
                             </span>
                           </label>

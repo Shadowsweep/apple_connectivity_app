@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Settings,
@@ -15,8 +15,8 @@ import {
   Save,
   RotateCcw,
   Sparkles,
-} from 'lucide-react';
-import { useLibraryInfo, useHealth, useTriggerIndex, useTriggerRebuild } from '../hooks/useLibrary';
+} from '../components/icons';
+import { useLibraryInfo, useHealth, useTriggerIndex, useTriggerRebuild, useSetLibraryPath } from '../hooks/useLibrary';
 import { useLibraryHealth, useScanHealth, useIndexUnindexed } from '../hooks/useLibraryHealth';
 import {
   useDatabaseIntegrity,
@@ -27,6 +27,8 @@ import {
 } from '../hooks/useDiagnostics';
 import { diagnosticsApi } from '../api/diagnosticsApi';
 import { Button } from '../components/common/Button';
+import { FolderBrowserModal } from '../components/common/FolderBrowserModal';
+import { AccentThemeCard } from '../components/settings/AccentThemeCard';
 import { formatBytes } from '../utils/formatters';
 
 export const SettingsPage: React.FC = () => {
@@ -46,6 +48,25 @@ export const SettingsPage: React.FC = () => {
   const cleanupThumbsMutation = useCleanupThumbnails();
 
   const [backupMessage, setBackupMessage] = useState<string | null>(null);
+  const [pathMessage, setPathMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [isBrowseOpen, setIsBrowseOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  const setLibraryPathMutation = useSetLibraryPath();
+
+  const applyLibraryPath = (path: string) => {
+    setPendingPath(path);
+    setLibraryPathMutation.mutate(path, {
+      onSuccess: (res) => {
+        setPathMessage({ ok: true, text: `Vault moved to ${res.root_path}` });
+        setPendingPath(null);
+      },
+      onError: (e: any) => {
+        setPathMessage({ ok: false, text: e.message || 'Failed to switch vault location' });
+        setPendingPath(null);
+      },
+    });
+  };
 
   const handleExportDiagnostics = async () => {
     try {
@@ -87,7 +108,7 @@ export const SettingsPage: React.FC = () => {
       <div className="flex items-center justify-between pb-4 border-b border-[#232736]">
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Settings className="w-5 h-5 text-[#2E7CF6]" /> Library Settings & Diagnostics
+            <Settings className="w-5 h-5 text-(--mm-accent)" /> Library Settings & Diagnostics
           </h2>
           <p className="text-xs text-[#A0A6B8]">
             Manage local vault directory, SQLite integrity, online backups, and reliability diagnostics.
@@ -107,7 +128,7 @@ export const SettingsPage: React.FC = () => {
           <Button
             variant="secondary"
             size="sm"
-            icon={<PieChart className="w-3.5 h-3.5 text-[#2E7CF6]" />}
+            icon={<PieChart className="w-3.5 h-3.5 text-(--mm-accent)" />}
             onClick={() => navigate('/storage')}
           >
             Storage Intelligence <ArrowRight className="w-3.5 h-3.5" />
@@ -180,7 +201,7 @@ export const SettingsPage: React.FC = () => {
               <button
                 onClick={() => indexUnindexedMutation.mutate()}
                 disabled={indexUnindexedMutation.isPending}
-                className="text-[10px] bg-[#2E7CF6] text-white px-2.5 py-1 rounded-lg font-bold hover:bg-[#2566c7] transition-colors"
+                className="text-[10px] bg-(--mm-accent) text-white px-2.5 py-1 rounded-lg font-bold hover:bg-(--mm-accent-hover) transition-colors"
               >
                 Index Now
               </button>
@@ -257,7 +278,7 @@ export const SettingsPage: React.FC = () => {
           </div>
           <div>
             <span className="text-[#6B7280] block text-[11px]">Journal Mode</span>
-            <span className="font-semibold text-[#00D68F]">WAL (Write-Ahead Logging)</span>
+              <span className="font-semibold text-[#00D68F]">{health?.database || 'WAL'}</span>
           </div>
           <div>
             <span className="text-[#6B7280] block text-[11px]">Integrity Check Result</span>
@@ -299,17 +320,47 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Interface Accent */}
+      <AccentThemeCard />
+
       {/* Storage Path Card */}
       <div className="bg-[#1A1D28] rounded-2xl p-6 border border-[#232736] space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-[#2E7CF6]/15 text-[#2E7CF6]">
-            <HardDrive className="w-5 h-5" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-(--mm-accent)/15 text-(--mm-accent)">
+              <HardDrive className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-white">Active Library Root</h4>
+              <p className="text-xs font-mono text-[#A0A6B8]">{lib?.root_path || 'Loading...'}</p>
+              <p className="text-[11px] text-[#6B7280] mt-1">
+                All imports (iPhone, USB, local folders) are stored inside this vault.
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white">Active Library Root</h4>
-            <p className="text-xs font-mono text-[#A0A6B8]">{lib?.root_path || 'Loading...'}</p>
-          </div>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={setLibraryPathMutation.isPending}
+            onClick={() => setIsBrowseOpen(true)}
+          >
+            {setLibraryPathMutation.isPending ? 'Switching...' : 'Change Vault Location'}
+          </Button>
         </div>
+
+        {pathMessage && (
+          <div
+            className={
+              'p-3 rounded-xl text-xs border ' +
+              (pathMessage.ok
+                ? 'bg-[#00D68F]/10 border-[#00D68F]/20 text-[#00D68F]'
+                : 'bg-[#FF3B30]/10 border-[#FF3B30]/20 text-[#FF3B30]')
+            }
+          >
+            {pathMessage.text}
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#232736] text-xs">
           <div>
@@ -322,7 +373,7 @@ export const SettingsPage: React.FC = () => {
           </div>
           <div>
             <span className="text-[#6B7280] block text-[11px]">Safety Reserve</span>
-            <span className="font-semibold text-[#FFB300]">10.0 GB Reserve</span>
+            <span className="font-semibold text-[#FFB300]">{lib ? formatBytes(lib.safety_reserve_bytes) + ' Reserve' : '...'}</span>
           </div>
         </div>
       </div>
@@ -404,6 +455,12 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <FolderBrowserModal
+        open={isBrowseOpen}
+        onClose={() => setIsBrowseOpen(false)}
+        onSelect={applyLibraryPath}
+      />
     </div>
   );
 };

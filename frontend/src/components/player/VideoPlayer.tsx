@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, Check, FastForward } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, Check, FastForward } from '../icons';
 import { mediaApi } from '../../api/mediaApi';
 import { playbackApi } from '../../api/playbackApi';
 import { formatDuration } from '../../utils/formatters';
@@ -37,6 +37,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       videoRef.current.currentTime = initialPositionMs / 1000;
     }
   }, [initialPositionMs]);
+
+  // Autoplay on open
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {
+      // autoplay blocked; user can press play
+    });
+  }, [mediaId]);
 
   // Periodic watch progress sync
   useEffect(() => {
@@ -217,7 +224,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             max={durationMs || 100}
             value={currentTimeMs}
             onChange={handleSeek}
-            className='w-full h-1.5 bg-[#30354A] rounded-lg appearance-none cursor-pointer accent-[#2E7CF6]'
+            className='w-full h-1.5 bg-[#30354A] rounded-lg appearance-none cursor-pointer accent-(--mm-accent)'
           />
         </div>
 
@@ -256,7 +263,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               onClick={cycleSpeed}
               className='px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors flex items-center gap-1'
             >
-              <FastForward className='w-3 h-3 text-[#2E7CF6]' />
+              <FastForward className='w-3 h-3 text-(--mm-accent)' />
               {playbackRate + 'x'}
             </button>
 

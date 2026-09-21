@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, Image as ImageIcon, Video as VideoIcon, FolderHeart } from 'lucide-react';
+import { Search, X, Image as ImageIcon, Video as VideoIcon, FolderHeart } from '../icons';
 import { useMediaList } from '../../hooks/useMedia';
 import { useAlbums } from '../../hooks/useAlbums';
 import { MediaRecord } from '../../types/media';
@@ -9,6 +9,7 @@ import { formatBytes, formatDuration } from '../../utils/formatters';
 
 interface SearchModalProps {
   isOpen: boolean;
+  initialQuery?: string;
   onClose: () => void;
   onSelectMedia: (media: MediaRecord) => void;
   onSelectAlbum: (album: AlbumRecord) => void;
@@ -16,6 +17,7 @@ interface SearchModalProps {
 
 export const SearchModal: React.FC<SearchModalProps> = ({
   isOpen,
+  initialQuery = '',
   onClose,
   onSelectMedia,
   onSelectAlbum,
@@ -32,9 +34,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      setQuery(initialQuery);
       setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery('');
     }
   }, [isOpen]);
 
@@ -66,7 +67,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       <div className='w-full max-w-2xl bg-[#12141C] border border-[#232736] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[75vh]'>
         {/* Search Input Bar */}
         <div className='p-4 border-b border-[#232736] flex items-center gap-3 bg-[#1A1D28]/50'>
-          <Search className='w-5 h-5 text-[#2E7CF6]' />
+          <Search className='w-5 h-5 text-(--mm-accent)' />
           <input
             ref={inputRef}
             type='text'
@@ -95,7 +96,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               {filteredAlbums.length > 0 && (
                 <div className='space-y-2'>
                   <span className='text-[11px] font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1.5'>
-                    <FolderHeart className='w-3.5 h-3.5 text-[#2E7CF6]' /> Albums ({filteredAlbums.length})
+                    <FolderHeart className='w-3.5 h-3.5 text-(--mm-accent)' /> Albums ({filteredAlbums.length})
                   </span>
                   <div className='grid grid-cols-2 gap-2'>
                     {filteredAlbums.map((album) => (
@@ -105,7 +106,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                           onSelectAlbum(album);
                           onClose();
                         }}
-                        className='p-3 bg-[#1A1D28] rounded-xl border border-[#232736] hover:border-[#2E7CF6]/50 cursor-pointer flex items-center justify-between text-xs'
+                        className='p-3 bg-[#1A1D28] rounded-xl border border-[#232736] hover:border-(--mm-accent)/50 cursor-pointer flex items-center justify-between text-xs'
                       >
                         <span className='font-medium text-white'>{album.name}</span>
                       </div>
@@ -118,7 +119,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               {videos.length > 0 && (
                 <div className='space-y-2'>
                   <span className='text-[11px] font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1.5'>
-                    <VideoIcon className='w-3.5 h-3.5 text-[#2E7CF6]' /> Videos ({videos.length})
+                    <VideoIcon className='w-3.5 h-3.5 text-(--mm-accent)' /> Videos ({videos.length})
                   </span>
                   <div className='grid grid-cols-2 sm:grid-cols-3 gap-2'>
                     {videos.map((media) => (
@@ -128,7 +129,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                           onSelectMedia(media);
                           onClose();
                         }}
-                        className='p-2 bg-[#1A1D28] rounded-xl border border-[#232736] hover:border-[#2E7CF6]/50 cursor-pointer flex items-center gap-2.5 text-xs'
+                        className='p-2 bg-[#1A1D28] rounded-xl border border-[#232736] hover:border-(--mm-accent)/50 cursor-pointer flex items-center gap-2.5 text-xs'
                       >
                         <img
                           src={mediaApi.getThumbnailUrl(media.id)}
@@ -159,7 +160,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                           onSelectMedia(media);
                           onClose();
                         }}
-                        className='group relative aspect-square rounded-xl overflow-hidden border border-[#232736] hover:border-[#2E7CF6] cursor-pointer'
+                        className='group relative aspect-square rounded-xl overflow-hidden border border-[#232736] hover:border-(--mm-accent) cursor-pointer'
                       >
                         <img
                           src={mediaApi.getThumbnailUrl(media.id)}

@@ -3,17 +3,21 @@ name = "memeasy"
 version = "1.0.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.141.1",
     "httpx>=0.28.1",
+    "imageio[ffmpeg]>=2.37.4",
     "pillow>=12.3.0",
+    "pillow-heif>=1.7.0",
     "pydantic>=2.13.5",
     "pyinstaller>=6.22.3",
+    "pymobiledevice3>=11.12.5",
     "pytest>=9.1.1",
+    "pywin32>=311; sys_platform == 'win32'",
+    "typesafe-sdk>=0.5.7",
     "uvicorn>=0.52.4",
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-

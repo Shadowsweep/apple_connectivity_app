@@ -70,3 +70,60 @@ def test_api_media_listing_filtering_and_pagination(tmp_path: Path):
     # 6. Non-existent media detail 404
     resp_404 = client.get("/api/media/non_existent_id")
     assert resp_404.status_code == 404
+
+
+def test_api_vault_folders_and_move_media(tmp_path: Path):
+    lib_dir = tmp_path / "vault_test"
+    lib_dir.mkdir(parents=True, exist_ok=True)
+    app = create_app(lib_dir)
+    client = TestClient(app)
+    ctx = get_app_context()
+    lib = ctx.library_repo.get_or_create(str(lib_dir))
+
+    # Create physical dummy file
+    (lib_dir / "Photos" / "2026" / "01").mkdir(parents=True, exist_ok=True)
+    photo_file = lib_dir / "Photos" / "2026" / "01" / "IMG_1001.JPG"
+    photo_file.write_bytes(b"dummy image data")
+
+    record = MediaRecord(
+        id="media_1001",
+        library_id=lib.id,
+        filename="IMG_1001.JPG",
+        relative_path="Photos/2026/01/IMG_1001.JPG",
+        media_type="PHOTO",
+        extension=".jpg",
+        size_bytes=16,
+        capture_date=datetime(2026, 1, 15, 10, 0, 0),
+        hash_sha256="test_hash_1001",
+        status="ACTIVE",
+    )
+    ctx.media_repo.insert_or_update(record)
+
+    # 1. List folders
+    resp = client.get("/api/vault/folders")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert any(f["relative_path"] == "Photos" for f in data["folders"])
+
+    # 2. Create new folder inside vault
+    resp_mkdir = client.post("/api/vault/folders", json={"parent": "Trips", "name": "Summer2026"})
+    assert resp_mkdir.status_code == 200
+    assert (lib_dir / "Trips" / "Summer2026").exists()
+
+    # 3. Move media into the newly created folder
+    resp_move = client.post(
+        "/api/vault/move-media",
+        json={"media_ids": ["media_1001"], "target_folder": "Trips/Summer2026", "copy_media": False},
+    )
+    assert resp_move.status_code == 200
+    move_data = resp_move.json()
+    assert move_data["moved_count"] == 1
+    assert "media_1001" in move_data["moved_ids"]
+
+    # Verify disk and DB
+    assert (lib_dir / "Trips" / "Summer2026" / "IMG_1001.JPG").exists()
+    assert not photo_file.exists()
+
+    updated = ctx.media_repo.get_by_id("media_1001")
+    assert updated.relative_path == "Trips/Summer2026/IMG_1001.JPG"
+

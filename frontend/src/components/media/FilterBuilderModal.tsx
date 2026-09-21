@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Filter, Bookmark, Check, RotateCcw } from 'lucide-react';
+import { X, Filter, Bookmark, Check, RotateCcw } from '../icons';
 import { MediaFilters } from '../../types/filters';
 import { Button } from '../common/Button';
 import { useCreateSavedSearch } from '../../hooks/useSavedSearches';
@@ -64,7 +64,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
         {/* Header */}
         <div className='flex items-center justify-between pb-4 border-b border-[#232736]'>
           <div className='flex items-center gap-2'>
-            <Filter className='w-5 h-5 text-[#2E7CF6]' />
+            <Filter className='w-5 h-5 text-(--mm-accent)' />
             <h3 className='text-base font-bold text-white'>Advanced Query Builder</h3>
           </div>
           <button
@@ -88,7 +88,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                   onClick={() => setDraft({ ...draft, mediaType: t === 'ALL' ? undefined : t })}
                   className={`py-2 px-1 rounded-xl font-semibold border text-center transition-all ${
                     (draft.mediaType || 'ALL') === t || (!draft.mediaType && t === 'ALL')
-                      ? 'bg-[#2E7CF6] text-white border-[#2E7CF6]'
+                      ? 'bg-(--mm-accent) text-white border-(--mm-accent)'
                       : 'bg-[#1A1D28] text-[#A0A6B8] border-[#232736] hover:text-white'
                   }`}
                 >
@@ -106,7 +106,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                 type='date'
                 value={draft.startDate || ''}
                 onChange={(e) => setDraft({ ...draft, startDate: e.target.value || undefined })}
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               />
             </div>
             <div className='space-y-1.5'>
@@ -115,7 +115,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                 type='date'
                 value={draft.endDate || ''}
                 onChange={(e) => setDraft({ ...draft, endDate: e.target.value || undefined })}
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                     minSize: e.target.value ? parseInt(e.target.value, 10) * 1024 * 1024 : undefined,
                   })
                 }
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               />
             </div>
             <div className='space-y-1.5'>
@@ -149,7 +149,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                     maxSize: e.target.value ? parseInt(e.target.value, 10) * 1024 * 1024 : undefined,
                   })
                 }
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               />
             </div>
           </div>
@@ -168,7 +168,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                     minWidth: e.target.value ? parseInt(e.target.value, 10) : undefined,
                   })
                 }
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               />
               <input
                 type='number'
@@ -180,7 +180,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                     minHeight: e.target.value ? parseInt(e.target.value, 10) : undefined,
                   })
                 }
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               />
             </div>
           </div>
@@ -192,7 +192,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
               <select
                 value={draft.extension || ''}
                 onChange={(e) => setDraft({ ...draft, extension: e.target.value || undefined })}
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               >
                 <option value=''>Any Extension</option>
                 <option value='heic'>HEIC (Apple Photo)</option>
@@ -207,7 +207,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
               <select
                 value={draft.sort || 'newest'}
                 onChange={(e) => setDraft({ ...draft, sort: e.target.value as any })}
-                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-[#2E7CF6]'
+                className='w-full bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-2 text-white outline-none focus:border-(--mm-accent)'
               >
                 <option value='newest'>Capture Date (Newest first)</option>
                 <option value='oldest'>Capture Date (Oldest first)</option>
@@ -229,7 +229,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                 onChange={(e) =>
                   setDraft({ ...draft, favorite: e.target.checked ? true : undefined })
                 }
-                className='rounded border-[#232736] bg-[#1A1D28] text-[#2E7CF6] focus:ring-0 w-4 h-4'
+                className='rounded border-[#232736] bg-[#1A1D28] text-(--mm-accent) focus:ring-0 w-4 h-4'
               />
               <span className='text-[#A0A6B8] font-medium'>Starred Favorites Only</span>
             </label>
@@ -242,7 +242,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
             <button
               type='button'
               onClick={() => setShowSaveInput(true)}
-              className='text-xs text-[#2E7CF6] hover:underline flex items-center gap-1.5'
+              className='text-xs text-(--mm-accent) hover:underline flex items-center gap-1.5'
             >
               <Bookmark className='w-3.5 h-3.5' /> Save this query as Smart Search...
             </button>
@@ -253,7 +253,7 @@ export const FilterBuilderModal: React.FC<FilterBuilderModalProps> = ({
                 placeholder='Search Name (e.g. 4K Videos)'
                 value={saveSearchName}
                 onChange={(e) => setSaveSearchName(e.target.value)}
-                className='flex-1 bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-[#2E7CF6]'
+                className='flex-1 bg-[#1A1D28] border border-[#232736] rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-(--mm-accent)'
               />
               <Button
                 variant='primary'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, ChevronRight, Image as ImageIcon, Video, Sparkles, Folder } from 'lucide-react';
+import { Calendar, ChevronRight, Image as ImageIcon, Video, Sparkles, Folder } from '../components/icons';
 import { useTimelineYears, useTimelineMonths, useTimelineMedia } from '../hooks/useTimeline';
 import { useFavorites, useToggleFavorite } from '../hooks/useMedia';
 import { MediaCard } from '../components/media/MediaCard';
@@ -40,7 +40,7 @@ export const TimelinePage: React.FC = () => {
       <div className='flex items-center justify-between pb-4 border-b border-[#232736]'>
         <div>
           <h2 className='text-xl font-bold text-white flex items-center gap-2'>
-            <Calendar className='w-5 h-5 text-[#2E7CF6]' /> Timeline Explorer
+            <Calendar className='w-5 h-5 text-(--mm-accent)' /> Timeline Explorer
           </h2>
           <p className='text-xs text-[#A0A6B8]'>
             Hierarchical capture date timeline with instant on-demand drill-down.
@@ -62,7 +62,7 @@ export const TimelinePage: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all ${
                 activeYear === year
-                  ? 'bg-[#2E7CF6] text-white shadow-lg shadow-[#2E7CF6]/20'
+                  ? 'bg-(--mm-accent) text-white shadow-lg shadow-(--mm-accent)/20'
                   : 'bg-[#1A1D28] text-[#A0A6B8] hover:text-white border border-[#232736]'
               }`}
             >
@@ -86,7 +86,7 @@ export const TimelinePage: React.FC = () => {
             onClick={() => setSelectedMonth(null)}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               selectedMonth === null
-                ? 'bg-[#1A1D28] text-white border border-[#2E7CF6]'
+                ? 'bg-[#1A1D28] text-white border border-(--mm-accent)'
                 : 'text-[#6B7280] hover:text-[#A0A6B8]'
             }`}
           >
@@ -102,7 +102,7 @@ export const TimelinePage: React.FC = () => {
                 onClick={() => setSelectedMonth(month)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   selectedMonth === month
-                    ? 'bg-[#2E7CF6]/20 text-[#2E7CF6] border border-[#2E7CF6]/40'
+                    ? 'bg-(--mm-accent)/20 text-(--mm-accent) border border-(--mm-accent)/40'
                     : 'bg-[#1A1D28]/40 text-[#A0A6B8] hover:text-white border border-transparent'
                 }`}
               >

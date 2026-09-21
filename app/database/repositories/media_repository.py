@@ -61,6 +61,53 @@ class MediaRepository:
 
         return media
 
+    def insert_or_update_many(self, records: List[MediaRecord]) -> None:
+        """Single-transaction batch write (import flush per ~100 files)."""
+        if not records:
+            return
+        now = utc_now()
+        with self.db.transaction() as tconn:
+            for media in records:
+                if not media.created_at:
+                    media.created_at = now
+                media.updated_at = now
+                cur = tconn.execute("SELECT id FROM media WHERE id = ?", (media.id,))
+                if cur.fetchone():
+                    tconn.execute(
+                        """
+                        UPDATE media SET
+                            library_id = ?, filename = ?, relative_path = ?, media_type = ?,
+                            mime_type = ?, extension = ?, size_bytes = ?, capture_date = ?,
+                            imported_at = ?, width = ?, height = ?, duration_ms = ?,
+                            hash_sha256 = ?, thumbnail_path = ?, status = ?, updated_at = ?
+                        WHERE id = ?
+                        """,
+                        (
+                            media.library_id, media.filename, media.relative_path, media.media_type,
+                            media.mime_type, media.extension, media.size_bytes, media.capture_date,
+                            media.imported_at, media.width, media.height, media.duration_ms,
+                            media.hash_sha256, media.thumbnail_path, media.status, media.updated_at,
+                            media.id,
+                        ),
+                    )
+                else:
+                    tconn.execute(
+                        """
+                        INSERT INTO media (
+                            id, library_id, filename, relative_path, media_type, mime_type,
+                            extension, size_bytes, capture_date, imported_at, width, height,
+                            duration_ms, hash_sha256, thumbnail_path, status, created_at, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            media.id, media.library_id, media.filename, media.relative_path,
+                            media.media_type, media.mime_type, media.extension, media.size_bytes,
+                            media.capture_date, media.imported_at, media.width, media.height,
+                            media.duration_ms, media.hash_sha256, media.thumbnail_path,
+                            media.status, media.created_at, media.updated_at,
+                        ),
+                    )
+
     def get_by_id(self, media_id: str) -> Optional[MediaRecord]:
         conn = self.db.get_connection()
         cursor = conn.cursor()

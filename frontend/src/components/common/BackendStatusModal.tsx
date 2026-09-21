@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw } from '../icons';
 import { Button } from './Button';
 import { libraryApi } from '../../api/libraryApi';
 
@@ -26,7 +26,7 @@ export const BackendStatusModal: React.FC = () => {
     checkHealth();
     const interval = setInterval(() => {
       checkHealth();
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [retryCount]);
 

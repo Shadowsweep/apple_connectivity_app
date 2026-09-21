@@ -110,6 +110,30 @@ def get_media_detail(media_id: str, ctx: AppContext = Depends(get_app_context)):
     return record
 
 
+class TrashMediaRequest(BaseModel):
+    media_ids: List[str]
+
+
+class TrashMediaResponse(BaseModel):
+    trashed_count: int
+    trashed_ids: List[str]
+
+
+@router.post("/media/trash", response_model=TrashMediaResponse)
+def trash_media(
+    req: TrashMediaRequest,
+    ctx: AppContext = Depends(get_app_context),
+):
+    """Soft-deletes a batch of media items (movable to trash, restorable later)."""
+    trashed = []
+    for media_id in req.media_ids:
+        record = ctx.media_repo.get_by_id(media_id)
+        if record and record.status == "ACTIVE":
+            ctx.media_repo.mark_status(media_id, "TRASHED")
+            trashed.append(media_id)
+    return TrashMediaResponse(trashed_count=len(trashed), trashed_ids=trashed)
+
+
 @router.get("/media/{media_id}/thumbnail")
 def get_media_thumbnail(media_id: str, ctx: AppContext = Depends(get_app_context)):
     record = ctx.media_repo.get_by_id(media_id)

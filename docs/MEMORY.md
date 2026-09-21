@@ -26,7 +26,7 @@ This document specifies the **application runtime state and persistence model** 
 
 ## 2. Persistent Storage Specification
 
-### `config/settings.json` (Global App Config)
+### `%USERPROFILE%\MEMEASY\settings.json` (Global App Config)
 ```json
 {
   "default_library_path": "D:\\MEMEASY_Library",
@@ -53,3 +53,26 @@ Stores catalog records, album mappings, favorites, and watch progress.
 3. **Thumbnail Generation**:
    - Lazily created when media is rendered or imported.
    - If missing from `.memeasy/thumbnails/`, regenerated on-the-fly from the authoritative media file.
+
+---
+
+## 4. Current Runtime Checkpoint (2026-09-15)
+
+- `AppContext.active_scan_results` caches the active iPhone provider and normalized scan results as `iphone_device` and `iphone_items`. Preview and start reuse this scan so the 11k-item phone is not enumerated twice.
+- A refresh closes the cached AFC provider before reconnecting. Application shutdown also closes the cached device.
+- Device scan state remains ephemeral; reconnect/rescan rebuilds it from the phone.
+- Import selection is frontend page state (`Set<string>` of device `unique_id` values). It is intentionally not durable across navigation or restart.
+- Import destinations are durable filesystem paths beneath the active vault. The request stores a relative `target_folder`; path validation rejects traversal outside the vault.
+- Groups are durable SQLite albums. `group_name` is resolved case-insensitively after import; a missing group is created, then successful imported media IDs are linked through `album_items`.
+- Physical organization under a custom destination remains deterministic:
+  `<target_folder>/<media type>/<year>/<month>/<filename>`.
+- The global settings file persists the selected vault, but startup probes it for write access. If a remembered removable drive is unavailable/inaccessible, runtime falls back to the default local `Library` instead of failing startup.
+
+### Paused-state evidence
+
+- Real device: Apple iPhone over the Apple Devices pairing service.
+- Read-only scan: 11,632 items, 29 month buckets, zero unknown-date entries, approximately 28.4 seconds.
+- Last complete backend run before the final checkpoint change: 55 passed.
+- New selective-import/WPD tests: 8 targeted tests passed.
+- Frontend TypeScript and Vite production build passed.
+- Full backend suite and packaged real-device smoke import are the next validations; see `docs/HANDOFF.md`.

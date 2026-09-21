@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   ShieldCheck,
@@ -12,7 +12,7 @@ import {
   Info,
   AlertTriangle,
   FileQuestion,
-} from 'lucide-react';
+} from '../components/icons';
 import {
   useCleanStatus,
   useCleanScanResults,
@@ -146,7 +146,7 @@ export const CleanMobilePage: React.FC = () => {
       {/* Device Connection Status Bar */}
       <div className="p-4 bg-[#1A1D28] border border-[#232736] rounded-2xl flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="p-2.5 bg-[#2E7CF6]/15 text-[#2E7CF6] rounded-xl">
+          <div className="p-2.5 bg-(--mm-accent)/15 text-(--mm-accent) rounded-xl">
             <Smartphone className="w-5 h-5" />
           </div>
           <div>
@@ -247,7 +247,7 @@ export const CleanMobilePage: React.FC = () => {
             onClick={() => setFilterTab('ALL')}
             className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
               filterTab === 'ALL'
-                ? 'bg-[#2E7CF6] text-white'
+                ? 'bg-(--mm-accent) text-white'
                 : 'text-[#A0A6B8] hover:text-white'
             }`}
           >
@@ -291,7 +291,7 @@ export const CleanMobilePage: React.FC = () => {
             size="sm"
             icon={
               selectedIds.size === cleanableItems.length && cleanableItems.length > 0 ? (
-                <CheckSquare className="w-4 h-4 text-[#2E7CF6]" />
+                <CheckSquare className="w-4 h-4 text-(--mm-accent)" />
               ) : (
                 <Square className="w-4 h-4" />
               )
@@ -335,7 +335,7 @@ export const CleanMobilePage: React.FC = () => {
                   onClick={() => isCleanable && toggleSelect(item)}
                   className={`px-6 py-3.5 flex items-center justify-between text-xs transition-colors ${
                     isCleanable ? 'cursor-pointer' : 'cursor-default opacity-80'
-                  } ${isSelected ? 'bg-[#2E7CF6]/10' : 'hover:bg-[#12141C]'}`}
+                  } ${isSelected ? 'bg-(--mm-accent)/10' : 'hover:bg-[#12141C]'}`}
                 >
                   <div className="flex items-center gap-3 w-1/2 min-w-0">
                     <input
@@ -343,7 +343,7 @@ export const CleanMobilePage: React.FC = () => {
                       checked={isSelected}
                       disabled={!isCleanable || deviceStatus?.supports_delete === false}
                       onChange={() => {}}
-                      className="rounded border-gray-600 text-[#2E7CF6] focus:ring-0 cursor-pointer disabled:opacity-30"
+                      className="rounded border-gray-600 text-(--mm-accent) focus:ring-0 cursor-pointer disabled:opacity-30"
                     />
                     <div className="min-w-0">
                       <span className="font-medium text-white block truncate" title={item.filename}>

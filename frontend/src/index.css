@@ -9,8 +9,10 @@
   --text-primary: #FFFFFF;
   --text-secondary: #A0A6B8;
   --text-muted: #6B7280;
-  --brand-primary: #2E7CF6;
-  --brand-primary-hover: #438CF9;
+  --brand-primary: #91C733;
+  --brand-primary-hover: #A6DB4D;
+  --mm-accent: #91C733;
+  --mm-accent-hover: #A6DB4D;
   --status-verified: #00D68F;
   --status-warning: #FFB300;
   --status-error: #FF3B30;

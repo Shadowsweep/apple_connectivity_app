@@ -1,4 +1,6 @@
 from pathlib import Path
+import sys
+import uuid
 from typing import Optional
 
 from app.api.jobs_manager import JobManager
@@ -15,7 +17,7 @@ from app.database.repositories.library_repository import LibraryRepository
 from app.database.repositories.media_repository import MediaRepository
 from app.database.repositories.saved_search_repository import SavedSearchRepository
 from app.database.repositories.watch_repository import WatchRepository
-from app.device.iphone import MediaDevice, MockIPhoneDevice
+from app.device.iphone import MediaDevice, get_connected_iphone
 from app.duplicate.detector import DuplicateDetector
 from app.importer.importer import SafeImporter
 from app.indexer.indexer import LibraryIndexer
@@ -80,12 +82,18 @@ class AppContext:
         self._connected_device: Optional[MediaDevice] = None
 
     def get_connected_device(self) -> MediaDevice:
-        """Returns currently active device or fallback Mock iPhone for testing/demo."""
+        """Returns explicitly-set device first, then real USB iPhone, then mock fallback."""
         if self._connected_device is not None and self._connected_device.is_connected:
             return self._connected_device
+        real = get_connected_iphone()
+        if real is not None:
+            self._connected_device = real
+            return real
         # Default fallback: mock device folder
         mock_path = self.library_root.parent / "MockiPhone"
         mock_path.mkdir(parents=True, exist_ok=True)
+        from app.device.iphone import MockIPhoneDevice
+
         self._connected_device = MockIPhoneDevice(mock_path, name="iPhone 15 Pro (Connected)")
         return self._connected_device
 
@@ -102,8 +110,24 @@ def init_app_context(
 ) -> AppContext:
     global _GLOBAL_CONTEXT
     if library_root is None:
-        base_dir = Path(__file__).resolve().parent.parent.parent
-        library_root = base_dir / "Library"
+        from app.core.app_settings import load_settings
+        # ponytail: frozen exe must not use the PyInstaller temp extraction dir
+        configured = load_settings().get("default_library_path")
+        configured_root = Path(configured).resolve() if configured else None
+        if configured_root and configured_root.exists() and configured_root.is_dir():
+            # A remembered removable-drive vault can exist but still be inaccessible.
+            # Probe it before logging/database initialization so startup can recover.
+            probe = configured_root / f".memeasy_probe_{uuid.uuid4().hex}"
+            try:
+                probe.write_text("ok", encoding="utf-8")
+                probe.unlink(missing_ok=True)
+                library_root = configured_root
+            except OSError:
+                library_root = None
+
+        if library_root is None:
+            base_dir = Path.home() / "MEMEASY" if getattr(sys, "frozen", False) else Path(__file__).resolve().parent.parent.parent
+            library_root = base_dir / "Library"
 
     _GLOBAL_CONTEXT = AppContext(
         library_root, safety_reserve_bytes=safety_reserve_bytes

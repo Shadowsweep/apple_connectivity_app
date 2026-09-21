@@ -52,6 +52,7 @@ class ImportSummary:
     bytes_imported: int
     import_id: Optional[str] = None
     imported_files: List[Tuple[MediaItem, Path]] = field(default_factory=list)
+    imported_media_ids: List[str] = field(default_factory=list)
     errors: List[Tuple[MediaItem, str]] = field(default_factory=list)
 
     @property
@@ -85,7 +86,7 @@ class SafeImporter:
             self.media_repo = None
             self.import_repo = None
 
-    def preview(self, items: List[MediaItem]) -> ImportPreview:
+    def preview(self, items: List[MediaItem], device=None) -> ImportPreview:
         """Generates a non-destructive import preview calculating space and duplicates."""
         photos = 0
         videos = 0
@@ -106,7 +107,7 @@ class SafeImporter:
             elif item.media_type == MediaType.LIVE_PHOTO:
                 live_photos += 1
 
-            status, existing_record = self.duplicate_detector.check_item(item)
+            status, existing_record = self.duplicate_detector.check_item(item, device=device)
             if status == DuplicateStatus.ALREADY_IMPORTED and existing_record is not None:
                 already_imported.append((item, existing_record))
             else:
@@ -134,6 +135,7 @@ class SafeImporter:
         items: List[MediaItem],
         device: MediaDevice,
         progress_callback: Optional[Callable[[int, int, MediaItem, str], None]] = None,
+        destination_prefix: Optional[Path] = None,
     ) -> ImportSummary:
         """Executes the safe copy, verify, organize, and SQLite index registration pipeline."""
         self.storage_manager.ensure_directory_structure()
@@ -176,50 +178,49 @@ class SafeImporter:
         session_staging = staging_dir / session_id
         session_staging.mkdir(parents=True, exist_ok=True)
 
+        # ponytail: batch DB writes per ~100 files — one txn, progress still per-file
+        pending_media: List[MediaRecord] = []
+        pending_items: List[ImportItemRecord] = []
+
+        def flush() -> None:
+            if self.db and imp_record:
+                if pending_media:
+                    self.media_repo.insert_or_update_many(pending_media)
+                    pending_media.clear()
+                if pending_items:
+                    self.import_repo.add_import_items_many(pending_items)
+                    pending_items.clear()
+
+        def buf_item(rec: ImportItemRecord) -> None:
+            pending_items.append(rec)
+            if len(pending_items) + len(pending_media) >= 100:
+                flush()
+
         try:
             for idx, item in enumerate(items, start=1):
                 if progress_callback:
-                    progress_callback(idx, len(items), item, "Checking duplicates & space...")
+                    progress_callback(idx, len(items), item, "Checking space...")
 
-                # 1. Duplicate check
-                status, existing_record = self.duplicate_detector.check_item(item)
-                if status == DuplicateStatus.ALREADY_IMPORTED:
-                    summary.duplicates_skipped_count += 1
-                    if self.db and imp_record:
-                        item_rec = ImportItemRecord(
-                            id=str(uuid.uuid4()),
-                            import_id=import_id,
-                            media_id=None,
-                            source_path=str(item.source_entry.source_path if item.source_entry else item.filename),
-                            status="SKIPPED_DUPLICATE",
-                        )
-                        self.import_repo.add_import_item(item_rec)
-
-                    if progress_callback:
-                        progress_callback(idx, len(items), item, "Already imported (skipped)")
-                    continue
-
-                # 2. Storage reserve check
+                # 1. Storage reserve check (no USB hash pre-copy — exact dedup at step 4b)
                 if not self.storage_manager.can_fit_bytes(item.size_bytes):
                     summary.skipped_space_count += 1
                     err_msg = "Insufficient disk space (respecting 10 GB safety reserve)"
                     summary.errors.append((item, err_msg))
                     if self.db and imp_record:
-                        item_rec = ImportItemRecord(
+                        buf_item(ImportItemRecord(
                             id=str(uuid.uuid4()),
                             import_id=import_id,
                             media_id=None,
                             source_path=str(item.source_entry.source_path if item.source_entry else item.filename),
                             status="SKIPPED_SPACE",
                             error=err_msg,
-                        )
-                        self.import_repo.add_import_item(item_rec)
+                        ))
 
                     if progress_callback:
                         progress_callback(idx, len(items), item, "Skipped (Safety space limit reached)")
                     continue
 
-                # 3. Staged copy with .part extension
+                # 2. Staged copy with .part extension
                 if progress_callback:
                     progress_callback(idx, len(items), item, "Copying to staging...")
 
@@ -236,57 +237,81 @@ class SafeImporter:
                     err_msg = f"Copy failed: {str(copy_err)}"
                     summary.errors.append((item, err_msg))
                     if self.db and imp_record:
-                        item_rec = ImportItemRecord(
+                        buf_item(ImportItemRecord(
                             id=str(uuid.uuid4()),
                             import_id=import_id,
                             media_id=None,
                             source_path=str(item.source_entry.source_path if item.source_entry else item.filename),
                             status="FAILED",
                             error=err_msg,
-                        )
-                        self.import_repo.add_import_item(item_rec)
+                        ))
 
                     if temp_path.exists():
                         temp_path.unlink(missing_ok=True)
                     continue
 
-                # 4. Verification
+                # 3. Single staged hash + size verify (zero USB re-reads)
                 if progress_callback:
                     progress_callback(idx, len(items), item, "Verifying integrity...")
 
-                v_res = Verifier.verify(
-                    source_path=item.source_entry.source_path,
-                    staged_path=temp_path,
-                    expected_hash=item.hash_sha256,
-                )
-
-                if not v_res.is_valid:
+                staged_size = temp_path.stat().st_size
+                if staged_size != item.size_bytes:
                     summary.failed_count += 1
-                    err_msg = f"Verification failed: {v_res.error_message}"
+                    err_msg = f"Size mismatch: expected {item.size_bytes}B, got {staged_size}B"
                     summary.errors.append((item, err_msg))
                     if self.db and imp_record:
-                        item_rec = ImportItemRecord(
+                        buf_item(ImportItemRecord(
                             id=str(uuid.uuid4()),
                             import_id=import_id,
                             media_id=None,
                             source_path=str(item.source_entry.source_path if item.source_entry else item.filename),
                             status="FAILED",
                             error=err_msg,
-                        )
-                        self.import_repo.add_import_item(item_rec)
-
+                        ))
                     if temp_path.exists():
                         temp_path.unlink(missing_ok=True)
                     continue
 
-                # Store verified hash
-                item.hash_sha256 = v_res.staged_hash
+                # ponytail: one disk read — staged hash is the truth, no source re-hash
+                item.hash_sha256 = Verifier.compute_sha256(temp_path)
+
+                # 4b. Exact dedup at copy time (in-memory index + DB fallback)
+                dup = self.duplicate_detector.lookup_by_hash(item.hash_sha256)
+                if dup is None and self.db and self.media_repo:
+                    try:
+                        if self.media_repo.get_by_hash(item.hash_sha256):
+                            dup = LocalMediaRecord(
+                                relative_path=Path(""),
+                                absolute_path=Path(""),
+                                size_bytes=item.size_bytes,
+                                filename=item.filename,
+                                hash_sha256=item.hash_sha256,
+                            )
+                    except Exception:
+                        pass
+                if dup is not None:
+                    summary.duplicates_skipped_count += 1
+                    if self.db and imp_record:
+                        buf_item(ImportItemRecord(
+                            id=str(uuid.uuid4()),
+                            import_id=import_id,
+                            media_id=None,
+                            source_path=str(item.source_entry.source_path if item.source_entry else item.filename),
+                            status="SKIPPED_DUPLICATE",
+                        ))
+                    if progress_callback:
+                        progress_callback(idx, len(items), item, "Already imported (skipped)")
+                    if temp_path.exists():
+                        temp_path.unlink(missing_ok=True)
+                    continue
 
                 # 5. Determine destination & Atomic Move with .part and replace
                 if progress_callback:
                     progress_callback(idx, len(items), item, "Organizing into library...")
 
-                final_rel_path = self.organizer.resolve_destination(item)
+                final_rel_path = self.organizer.resolve_destination(
+                    item, destination_prefix=destination_prefix
+                )
                 final_abs_path = self.storage_manager.library_root / final_rel_path
                 final_abs_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -298,10 +323,34 @@ class SafeImporter:
                 # 6. Register into duplicate cache
                 self.duplicate_detector.register_imported(item, final_rel_path)
 
-                # 7. Register in SQLite database
+                # 7. Extract rich metadata from imported local file (EXIF, dimensions, video duration)
+                try:
+                    from app.device.iphone import DeviceMediaEntry
+                    from app.scanner.metadata import MetadataExtractor
+                    local_entry = DeviceMediaEntry(
+                        device_id="local",
+                        unique_id=str(final_abs_path),
+                        filename=final_abs_path.name,
+                        size_bytes=final_abs_path.stat().st_size,
+                        source_path=final_abs_path,
+                        created_timestamp=final_abs_path.stat().st_ctime,
+                        modified_timestamp=final_abs_path.stat().st_mtime,
+                    )
+                    local_meta = MetadataExtractor.extract_from_entry(local_entry)
+                    if local_meta.capture_date:
+                        item.capture_date = local_meta.capture_date
+                    if local_meta.width and local_meta.height:
+                        item.width = local_meta.width
+                        item.height = local_meta.height
+                    if local_meta.duration_ms:
+                        item.duration_ms = local_meta.duration_ms
+                except Exception:
+                    pass
+
+                # 8. Register in SQLite database (buffered, flushed per ~100)
                 media_id = str(uuid.uuid4())
                 if self.db and lib_record and imp_record:
-                    media_record = MediaRecord(
+                    pending_media.append(MediaRecord(
                         id=media_id,
                         library_id=lib_record.id,
                         filename=item.filename,
@@ -309,7 +358,7 @@ class SafeImporter:
                         media_type=item.media_type.value,
                         mime_type=item.mime_type,
                         extension=item.extension,
-                        size_bytes=item.size_bytes,
+                        size_bytes=final_abs_path.stat().st_size if final_abs_path.exists() else item.size_bytes,
                         capture_date=item.capture_date,
                         imported_at=utc_now(),
                         width=item.width,
@@ -317,17 +366,16 @@ class SafeImporter:
                         duration_ms=item.duration_ms,
                         hash_sha256=item.hash_sha256,
                         status="ACTIVE",
-                    )
-                    self.media_repo.insert_or_update(media_record)
+                    ))
 
-                    item_rec = ImportItemRecord(
+                    buf_item(ImportItemRecord(
                         id=str(uuid.uuid4()),
                         import_id=import_id,
                         media_id=media_id,
                         source_path=str(item.source_entry.source_path if item.source_entry else item.filename),
                         status="SUCCESS",
-                    )
-                    self.import_repo.add_import_item(item_rec)
+                    ))
+                    summary.imported_media_ids.append(media_id)
 
                 summary.successful_count += 1
                 summary.bytes_imported += item.size_bytes
@@ -336,6 +384,7 @@ class SafeImporter:
                 if progress_callback:
                     progress_callback(idx, len(items), item, f"Imported -> {final_rel_path}")
 
+            flush()
             if self.db and imp_record:
                 imp_record.completed_at = utc_now()
                 imp_record.successful_files = summary.successful_count
@@ -346,6 +395,10 @@ class SafeImporter:
                 self.import_repo.update_import(imp_record)
 
         except Exception as e:
+            try:
+                flush()
+            except Exception:
+                pass
             if self.db and imp_record:
                 imp_record.completed_at = utc_now()
                 imp_record.status = "FAILED"

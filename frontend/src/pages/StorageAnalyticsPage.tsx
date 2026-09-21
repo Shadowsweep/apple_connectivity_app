@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HardDrive, Image as ImageIcon, Video, Layers, PieChart, Sparkles, FolderArchive, ArrowUpRight } from 'lucide-react';
+import { HardDrive, Image as ImageIcon, Video, Layers, PieChart, Sparkles, FolderArchive, ArrowUpRight } from '../components/icons';
 import { useStorageAnalytics } from '../hooks/useAnalytics';
 import { formatBytes } from '../utils/formatters';
 import { MediaViewer } from '../components/media/MediaViewer';
@@ -30,7 +30,7 @@ export const StorageAnalyticsPage: React.FC = () => {
       <div className='flex items-center justify-between pb-4 border-b border-[#232736]'>
         <div>
           <h2 className='text-xl font-bold text-white flex items-center gap-2'>
-            <PieChart className='w-5 h-5 text-[#2E7CF6]' /> Storage Intelligence
+            <PieChart className='w-5 h-5 text-(--mm-accent)' /> Storage Intelligence
           </h2>
           <p className='text-xs text-[#A0A6B8]'>
             Instant offline storage analysis across media types, formats, and historical years.
@@ -43,7 +43,7 @@ export const StorageAnalyticsPage: React.FC = () => {
         <div className='p-5 bg-[#1A1D28] rounded-2xl border border-[#232736] space-y-2'>
           <div className='flex items-center justify-between'>
             <span className='text-xs text-[#6B7280] font-medium'>Total Media Storage</span>
-            <HardDrive className='w-4 h-4 text-[#2E7CF6]' />
+            <HardDrive className='w-4 h-4 text-(--mm-accent)' />
           </div>
           <p className='text-2xl font-extrabold text-white'>
             {formatBytes(analytics.total_media_bytes)}
@@ -112,7 +112,7 @@ export const StorageAnalyticsPage: React.FC = () => {
             title={`Videos: ${videoPercent}%`}
           />
           <div
-            className='bg-[#2E7CF6] h-full transition-all'
+            className='bg-(--mm-accent) h-full transition-all'
             style={{ width: `${otherPercent}%` }}
             title={`Other: ${otherPercent}%`}
           />
@@ -129,7 +129,7 @@ export const StorageAnalyticsPage: React.FC = () => {
           </div>
           {otherPercent > 0 && (
             <div className='flex items-center gap-2'>
-              <div className='w-3 h-3 rounded bg-[#2E7CF6]' />
+              <div className='w-3 h-3 rounded bg-(--mm-accent)' />
               <span>Other ({otherPercent}%)</span>
             </div>
           )}
@@ -205,7 +205,7 @@ export const StorageAnalyticsPage: React.FC = () => {
             >
               <div className='flex items-center gap-3'>
                 <span className='text-xs font-mono font-bold text-[#6B7280] w-6'>{idx + 1}.</span>
-                <div className='p-2 rounded-lg bg-[#232736] text-[#A0A6B8] group-hover:text-[#2E7CF6]'>
+                <div className='p-2 rounded-lg bg-[#232736] text-[#A0A6B8] group-hover:text-(--mm-accent)'>
                   {file.media_type === 'VIDEO' ? (
                     <Video className='w-4 h-4' />
                   ) : (
@@ -213,7 +213,7 @@ export const StorageAnalyticsPage: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <h4 className='text-xs font-bold text-white group-hover:text-[#2E7CF6] transition-colors'>
+                  <h4 className='text-xs font-bold text-white group-hover:text-(--mm-accent) transition-colors'>
                     {file.filename}
                   </h4>
                   <span className='text-[11px] text-[#6B7280] font-mono'>

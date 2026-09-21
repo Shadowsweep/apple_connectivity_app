@@ -38,6 +38,18 @@ class AlbumRepository:
         row = cursor.fetchone()
         return AlbumRecord(**dict(row)) if row else None
 
+    def get_album_by_name(
+        self, library_id: str, name: str
+    ) -> Optional[AlbumRecord]:
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM albums WHERE library_id = ? AND name = ? COLLATE NOCASE LIMIT 1",
+            (library_id, name.strip()),
+        )
+        row = cursor.fetchone()
+        return AlbumRecord(**dict(row)) if row else None
+
     def list_albums(self, library_id: Optional[str] = None) -> List[AlbumRecord]:
         conn = self.db.get_connection()
         cursor = conn.cursor()

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star } from 'lucide-react';
+import { Star } from '../components/icons';
 import { useFavorites, useToggleFavorite } from '../hooks/useMedia';
 import { MediaGrid } from '../components/media/MediaGrid';
 import { MediaViewer } from '../components/media/MediaViewer';
@@ -29,6 +29,7 @@ export const FavoritesPage: React.FC = () => {
         items={favorites || []}
         favoriteIds={favSet}
         isLoading={isLoading}
+        groupByMonth
         onToggleFavorite={(media) =>
           toggleFavoriteMutation.mutate({
             mediaId: media.id,

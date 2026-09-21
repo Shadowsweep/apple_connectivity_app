@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Sparkles, FolderOpen } from 'lucide-react';
+import { Play, Sparkles, FolderOpen } from '../icons';
 import { MediaRecord } from '../../types/media';
 import { mediaApi } from '../../api/mediaApi';
 import { Button } from '../common/Button';
@@ -26,7 +26,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     return (
       <div className='relative w-full h-[320px] bg-gradient-to-r from-[#1A1D28] via-[#12141C] to-[#1A1D28] rounded-3xl border border-[#232736] p-10 flex flex-col justify-end shadow-2xl overflow-hidden'>
         <div className='max-w-xl space-y-3 z-10'>
-          <span className='px-3 py-1 rounded-full text-xs font-semibold bg-[#2E7CF6]/20 text-[#2E7CF6] border border-[#2E7CF6]/30 inline-flex items-center gap-1.5'>
+          <span className='px-3 py-1 rounded-full text-xs font-semibold bg-(--mm-accent)/20 text-(--mm-accent) border border-(--mm-accent)/30 inline-flex items-center gap-1.5'>
             <Sparkles className='w-3.5 h-3.5' /> Personal Media Platform
           </span>
           <h1 className='text-3xl font-extrabold text-white tracking-tight'>
@@ -65,7 +65,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       {/* Content Overlay */}
       <div className='relative h-full flex flex-col justify-end p-8 md:p-10 max-w-2xl space-y-3 z-10'>
         <div className='flex items-center gap-2'>
-          <span className='px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#2E7CF6] text-white tracking-wider uppercase'>
+          <span className='px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-(--mm-accent) text-white tracking-wider uppercase'>
             Featured Collection
           </span>
           <span className='text-xs text-[#A0A6B8] font-medium'>

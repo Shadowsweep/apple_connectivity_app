@@ -1,9 +1,9 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import List
+from typing import Callable, List, Optional
 
 from app.device.iphone import MediaDevice
-from app.scanner.metadata import MediaItem, MediaType, MetadataExtractor
+from app.scanner.metadata import MediaItem, MediaType, MetadataExtractor, judge_screenshots
 
 
 class MediaScanner:
@@ -14,20 +14,42 @@ class MediaScanner:
 
     def scan(self) -> List[MediaItem]:
         """Discovers all media on device and extracts standardized metadata."""
+        return self.scan_with_progress()
+
+    def scan_with_progress(self, progress_cb: Optional[Callable[[int, int], None]] = None) -> List[MediaItem]:
+        """Same as scan() but reports (completed, total) during metadata extraction."""
         if not self.device.is_connected:
             return []
 
         raw_entries = self.device.discover_media()
         items: List[MediaItem] = []
+        total = len(raw_entries)
 
         # Extract individual metadata
-        for entry in raw_entries:
+        for idx, entry in enumerate(raw_entries, start=1):
             item = MetadataExtractor.extract_from_entry(entry)
             items.append(item)
+            if progress_cb is not None and (idx % 25 == 0 or idx == total):
+                progress_cb(idx, total)
 
         # Detect and pair Live Photos (same base stem e.g. IMG_1001.HEIC + IMG_1001.MOV)
         self._detect_live_photos(items)
 
+        # ponytail: one batched Jev call re-checks non-camera-pattern PHOTO names
+        # (localized screenshots); no key/offline = no-op, never raises.
+        try:
+            hits = judge_screenshots([
+                it.filename for it in items
+                if it.media_type == MediaType.PHOTO and it.extension in MetadataExtractor.PHOTO_EXTENSIONS
+            ])
+        except Exception:
+            hits = set()
+        for it in items:
+            if it.filename in hits:
+                it.media_type = MediaType.SCREENSHOT
+
+        if progress_cb is not None and total:
+            progress_cb(total, total)
         return items
 
     def _detect_live_photos(self, items: List[MediaItem]):

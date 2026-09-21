@@ -30,8 +30,8 @@ export function useCreateAlbum() {
 export function useAddToAlbum() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ albumId, mediaId }: { albumId: string; mediaId: string }) =>
-      albumsApi.addMediaToAlbum(albumId, mediaId),
+    mutationFn: ({ albumId, mediaIds }: { albumId: string; mediaIds: string[] }) =>
+      albumsApi.addMediaToAlbum(albumId, mediaIds),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['albums', variables.albumId] });
       queryClient.invalidateQueries({ queryKey: ['albums'] });

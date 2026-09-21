@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Star, Film, HardDrive, Clock, Calendar, Bookmark, X } from 'lucide-react';
+import { Sparkles, Star, Film, HardDrive, Clock, Calendar, Bookmark, X } from '../icons';
 import { MediaFilters } from '../../types/filters';
 import { useSavedSearches, useDeleteSavedSearch } from '../../hooks/useSavedSearches';
 
@@ -30,7 +30,7 @@ export const SmartCollectionsBar: React.FC<SmartCollectionsBarProps> = ({
     {
       id: '4k_videos',
       label: '4K Videos',
-      icon: <Film className='w-3 h-3 text-[#2E7CF6]' />,
+      icon: <Film className='w-3 h-3 text-(--mm-accent)' />,
       query: { mediaType: 'VIDEO', minWidth: 3840, sort: 'newest' },
     },
     {
@@ -56,7 +56,7 @@ export const SmartCollectionsBar: React.FC<SmartCollectionsBarProps> = ({
   return (
     <div className='flex items-center gap-2 overflow-x-auto scrollbar-none py-1'>
       <span className='text-[11px] font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1 flex-shrink-0'>
-        <Sparkles className='w-3 h-3 text-[#2E7CF6]' /> Smart:
+        <Sparkles className='w-3 h-3 text-(--mm-accent)' /> Smart:
       </span>
 
       {presets.map((preset) => (
@@ -78,7 +78,7 @@ export const SmartCollectionsBar: React.FC<SmartCollectionsBarProps> = ({
           {savedSearches.map((s) => (
             <div
               key={s.id}
-              className='group flex items-center rounded-xl bg-[#2E7CF6]/10 border border-[#2E7CF6]/30 text-xs text-[#2E7CF6] font-semibold flex-shrink-0'
+              className='group flex items-center rounded-xl bg-(--mm-accent)/10 border border-(--mm-accent)/30 text-xs text-(--mm-accent) font-semibold flex-shrink-0'
             >
               <button
                 type='button'
@@ -94,7 +94,7 @@ export const SmartCollectionsBar: React.FC<SmartCollectionsBarProps> = ({
                   e.stopPropagation();
                   deleteSearchMutation.mutate(s.id);
                 }}
-                className='p-1 pr-2 text-[#2E7CF6]/60 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity'
+                className='p-1 pr-2 text-(--mm-accent)/60 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity'
               >
                 <X className='w-3 h-3' />
               </button>

@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { formatBytes } from '../../utils/formatters';
-import { AlertTriangle, Trash2, ShieldCheck, Loader2 } from 'lucide-react';
+import { AlertTriangle, Trash2, ShieldCheck, Loader2 } from '../icons';
 
 interface CleanConfirmationModalProps {
   isOpen: boolean;

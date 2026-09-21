@@ -18,7 +18,12 @@ class MediaOrganizer:
     def __init__(self, library_root: Path):
         self.library_root = Path(library_root)
 
-    def determine_relative_path(self, item: MediaItem, disambiguation_index: int = 0) -> Path:
+    def determine_relative_path(
+        self,
+        item: MediaItem,
+        disambiguation_index: int = 0,
+        destination_prefix: Optional[Path] = None,
+    ) -> Path:
         """Generates relative path e.g. Photos/2026/02/IMG_1024.HEIC."""
         top_folder = self.FOLDER_MAPPING.get(item.media_type, "Photos")
 
@@ -37,13 +42,16 @@ class MediaOrganizer:
             suffix = Path(filename).suffix
             filename = f"{stem}_{disambiguation_index}{suffix}"
 
-        return target_dir / filename
+        prefix = Path(destination_prefix) if destination_prefix else Path()
+        return prefix / target_dir / filename
 
-    def resolve_destination(self, item: MediaItem) -> Path:
+    def resolve_destination(
+        self, item: MediaItem, destination_prefix: Optional[Path] = None
+    ) -> Path:
         """Finds a non-colliding destination path if a different file with same name exists."""
         disambig = 0
         while True:
-            rel_path = self.determine_relative_path(item, disambig)
+            rel_path = self.determine_relative_path(item, disambig, destination_prefix)
             abs_path = self.library_root / rel_path
             if not abs_path.exists():
                 return rel_path

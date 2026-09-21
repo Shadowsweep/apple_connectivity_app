@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { useCleanHistory } from '../../hooks/useCleanMobile';
 import { formatBytes, formatDate } from '../../utils/formatters';
-import { History, Smartphone } from 'lucide-react';
+import { History, Smartphone } from '../icons';
 
 interface CleanupHistoryModalProps {
   isOpen: boolean;
@@ -41,7 +41,7 @@ export const CleanupHistoryModal: React.FC<CleanupHistoryModalProps> = ({
               <div key={record.id} className="p-4 flex items-center justify-between text-xs">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="w-4 h-4 text-[#2E7CF6]" />
+                    <Smartphone className="w-4 h-4 text-(--mm-accent)" />
                     <span className="font-semibold text-white">{record.device_id}</span>
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-medium ${
@@ -57,7 +57,7 @@ export const CleanupHistoryModal: React.FC<CleanupHistoryModalProps> = ({
                   </div>
                   <div className="text-[#6B7280]">
                     {formatDate(record.started_at)}
-                    {record.completed_at && ` • Finished ${formatDate(record.completed_at)}`}
+                    {record.completed_at && ` — Finished ${formatDate(record.completed_at)}`}
                   </div>
                 </div>
 
@@ -66,7 +66,7 @@ export const CleanupHistoryModal: React.FC<CleanupHistoryModalProps> = ({
                     +{formatBytes(record.bytes_reclaimed)} Reclaimed
                   </div>
                   <div className="text-[11px] text-[#A0A6B8]">
-                    {record.deleted_items} deleted • {record.failed_items} skipped
+                    {record.deleted_items} deleted — {record.failed_items} skipped
                   </div>
                 </div>
               </div>

@@ -17,10 +17,10 @@ export const albumsApi = {
     return request<AlbumDetailResponse>('/albums/' + albumId);
   },
 
-  addMediaToAlbum: async (albumId: string, mediaId: string): Promise<{ status: string }> => {
+  addMediaToAlbum: async (albumId: string, mediaIds: string[]): Promise<{ status: string }> => {
     return request('/albums/' + albumId + '/media', {
       method: 'POST',
-      body: JSON.stringify({ media_id: mediaId }),
+      body: JSON.stringify({ media_ids: mediaIds }),
     });
   },
 

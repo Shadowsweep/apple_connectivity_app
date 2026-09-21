@@ -7,7 +7,7 @@ interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
-  const hoverClass = onClick ? 'cursor-pointer hover:border-[#2E7CF6]/50 transition-all' : '';
+  const hoverClass = onClick ? 'cursor-pointer hover:border-(--mm-accent)/50 transition-all' : '';
   return (
     <div
       onClick={onClick}

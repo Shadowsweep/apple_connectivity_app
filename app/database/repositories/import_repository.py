@@ -67,6 +67,28 @@ class ImportRepository:
             )
         return item
 
+    def add_import_items_many(self, items: List[ImportItemRecord]) -> None:
+        """Single-transaction batch write (import flush per ~100 files)."""
+        if not items:
+            return
+        now = utc_now()
+        with self.db.transaction() as tconn:
+            for item in items:
+                if not item.created_at:
+                    item.created_at = now
+                item.updated_at = now
+                tconn.execute(
+                    """
+                    INSERT INTO import_items (
+                        id, import_id, media_id, source_path, status, error, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item.id, item.import_id, item.media_id, item.source_path,
+                        item.status, item.error, item.created_at, item.updated_at,
+                    ),
+                )
+
     def get_import_by_id(self, import_id: str) -> Optional[ImportRecord]:
         conn = self.db.get_connection()
         cursor = conn.cursor()

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Filter, Video } from 'lucide-react';
+import { Calendar, Filter, Video } from '../icons';
 import { ImportFilterParams } from '../../types/import';
 
 interface FilterStepProps {
@@ -16,7 +16,7 @@ export const FilterStep: React.FC<FilterStepProps> = ({ filters, onChange }) => 
         {/* Date Range */}
         <div>
           <label className='block text-xs font-medium text-[#A0A6B8] mb-2 flex items-center gap-1.5'>
-            <Calendar className='w-3.5 h-3.5 text-[#2E7CF6]' /> Capture Date Range
+            <Calendar className='w-3.5 h-3.5 text-(--mm-accent)' /> Capture Date Range
           </label>
           <div className='grid grid-cols-2 gap-2'>
             <div>
@@ -30,7 +30,7 @@ export const FilterStep: React.FC<FilterStepProps> = ({ filters, onChange }) => 
                     date_from: e.target.value ? e.target.value + 'T00:00:00' : undefined,
                   })
                 }
-                className='w-full px-2.5 py-1.5 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-[#2E7CF6]'
+                className='w-full px-2.5 py-1.5 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-(--mm-accent)'
               />
             </div>
             <div>
@@ -44,7 +44,7 @@ export const FilterStep: React.FC<FilterStepProps> = ({ filters, onChange }) => 
                     date_to: e.target.value ? e.target.value + 'T23:59:59' : undefined,
                   })
                 }
-                className='w-full px-2.5 py-1.5 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-[#2E7CF6]'
+                className='w-full px-2.5 py-1.5 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-(--mm-accent)'
               />
             </div>
           </div>
@@ -53,7 +53,7 @@ export const FilterStep: React.FC<FilterStepProps> = ({ filters, onChange }) => 
         {/* Min Video Size */}
         <div>
           <label className='block text-xs font-medium text-[#A0A6B8] mb-2 flex items-center gap-1.5'>
-            <Video className='w-3.5 h-3.5 text-[#2E7CF6]' /> Minimum Video Size
+            <Video className='w-3.5 h-3.5 text-(--mm-accent)' /> Minimum Video Size
           </label>
           <select
             value={filters.min_video_size_bytes ? String(filters.min_video_size_bytes / (1024 * 1024)) : '0'}
@@ -64,13 +64,43 @@ export const FilterStep: React.FC<FilterStepProps> = ({ filters, onChange }) => 
                 min_video_size_bytes: mb > 0 ? mb * 1024 * 1024 : undefined,
               });
             }}
-            className='w-full px-3 py-2 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-[#2E7CF6]'
+            className='w-full px-3 py-2 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-(--mm-accent)'
           >
             <option value='0'>All video sizes (No minimum)</option>
             <option value='50'>Larger than 50 MB</option>
             <option value='100'>Larger than 100 MB</option>
             <option value='500'>Larger than 500 MB (4K clips)</option>
             <option value='1024'>Larger than 1 GB (Long videos)</option>
+          </select>
+        </div>
+
+        {/* Batch Limit */}
+        <div className='md:col-span-2 pt-2 border-t border-[#232736] flex items-center justify-between'>
+          <div>
+            <label className='block text-xs font-medium text-white flex items-center gap-1.5'>
+              <Filter className='w-3.5 h-3.5 text-(--mm-accent)' /> Batch Import Limit
+            </label>
+            <span className='text-[10px] text-[#6B7280]'>
+              Limit items per import run to prevent USB/AFC socket timeouts on large camera rolls
+            </span>
+          </div>
+          <select
+            value={filters.limit ? String(filters.limit) : '0'}
+            onChange={(e) => {
+              const lim = parseInt(e.target.value, 10);
+              onChange({
+                ...filters,
+                limit: lim > 0 ? lim : undefined,
+              });
+            }}
+            className='px-3 py-2 rounded-lg bg-[#12141C] border border-[#232736] text-white text-xs focus:outline-none focus:border-(--mm-accent)'
+          >
+            <option value='0'>All Items (No batch limit)</option>
+            <option value='50'>Batch: 50 items</option>
+            <option value='100'>Batch: 100 items</option>
+            <option value='250'>Batch: 250 items</option>
+            <option value='500'>Batch: 500 items</option>
+            <option value='1000'>Batch: 1,000 items</option>
           </select>
         </div>
       </div>

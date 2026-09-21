@@ -6,6 +6,12 @@ from enum import Enum
 from pathlib import Path
 from typing import BinaryIO, Optional, Tuple
 from PIL import Image, ExifTags
+
+# ponytail: HEIC is the default iPhone format; without this opener PIL raises on every .heic
+from pillow_heif import register_heif_opener
+
+register_heif_opener()
+
 from pydantic import BaseModel, ConfigDict
 
 from app.device.iphone import DeviceMediaEntry
@@ -82,8 +88,17 @@ class MetadataExtractor:
         duration_ms = None
         mime_type = cls._guess_mime_type(ext)
 
+        # ponytail: virtual device paths (AFC/WPD) aren't local files — skip
+        # PIL open + ffmpeg spawn, use filename + filesystem timestamp only.
+        # Real EXIF/QuickTime is extracted once post-copy in the importer.
+        is_local = False
+        try:
+            is_local = Path(entry.source_path).exists()
+        except Exception:
+            is_local = False
+
         # 1. Try Image EXIF if image
-        if ext in cls.PHOTO_EXTENSIONS:
+        if is_local and ext in cls.PHOTO_EXTENSIONS:
             exif_date, exif_w, exif_h, exif_ori = cls._extract_image_exif(entry.source_path)
             if exif_date:
                 capture_date = exif_date
@@ -94,7 +109,7 @@ class MetadataExtractor:
                 orientation = exif_ori
 
         # 2. Try Video QuickTime / MP4 container metadata
-        elif ext in cls.VIDEO_EXTENSIONS:
+        elif is_local and ext in cls.VIDEO_EXTENSIONS:
             vid_date, vid_duration = cls._extract_quicktime_metadata(entry.source_path)
             if vid_date:
                 capture_date = vid_date
@@ -110,13 +125,14 @@ class MetadataExtractor:
                 capture_source = "FILENAME"
 
         # 4. Fallback to filesystem timestamp
-        if not capture_date and entry.created_timestamp:
+        if not capture_date and (entry.created_timestamp or entry.modified_timestamp):
             try:
                 # Use earlier of ctime or mtime if available
-                ts = entry.created_timestamp
-                if entry.modified_timestamp and entry.modified_timestamp < ts:
+                ts = entry.created_timestamp or entry.modified_timestamp
+                if entry.modified_timestamp and ts and entry.modified_timestamp < ts:
                     ts = entry.modified_timestamp
-                capture_date = datetime.fromtimestamp(ts, tz=timezone.utc).replace(tzinfo=None)
+                if ts is not None:
+                    capture_date = datetime.fromtimestamp(ts, tz=timezone.utc).replace(tzinfo=None)
                 capture_source = "FILESYSTEM"
             except Exception:
                 pass
@@ -208,9 +224,37 @@ class MetadataExtractor:
     @classmethod
     def _extract_quicktime_metadata(cls, file_path: Path) -> Tuple[Optional[datetime], Optional[int]]:
         """Parses QuickTime/MP4 header box ('mvhd') to extract creation timestamp & duration."""
+        dt, dur = None, None
         try:
             with open(file_path, "rb") as f:
-                return cls._parse_mp4_atoms(f)
+                dt, dur = cls._parse_mp4_atoms(f)
+        except Exception:
+            pass
+
+        if dur is None:
+            _, probe_dur = cls._extract_video_probe(file_path)
+            if probe_dur is not None:
+                dur = probe_dur
+
+        return dt, dur
+
+    @classmethod
+    def _extract_video_probe(cls, file_path: Path) -> Tuple[Optional[datetime], Optional[int]]:
+        """Fallback duration and timestamp probe using imageio-ffmpeg."""
+        try:
+            import imageio_ffmpeg
+            import subprocess
+            ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+            probe = subprocess.run(
+                [ffmpeg, "-i", str(file_path), "-f", "null", "-"],
+                capture_output=True, text=True, timeout=10,
+            )
+            duration_ms = None
+            m = re.search(r"Duration: (\d+):(\d+):(\d+)\.(\d+)", probe.stderr)
+            if m:
+                h, mi, s, ms = map(int, m.groups())
+                duration_ms = int((h * 3600 + mi * 60 + s + ms / 100) * 1000)
+            return None, duration_ms
         except Exception:
             return None, None
 
@@ -236,17 +280,17 @@ class MetadataExtractor:
             if content_size < 0:
                 break
 
-            if atom_type == b"moov":
-                # Sub-traverse moov container
+            if atom_type in (b"moov", b"trak", b"mdia", b"minf", b"stbl"):
+                # Container atoms: descend (loop re-reads children)
                 continue
             elif atom_type == b"mvhd":
                 mvhd_data = f.read(min(content_size, 32))
                 if len(mvhd_data) >= 20:
                     version = mvhd_data[0]
                     if version == 0:
-                        _, creation_time, _, time_scale, duration = struct.unpack(">BIII I", mvhd_data[:17])
+                        _, _, creation_time, _, time_scale, duration = struct.unpack(">B3sIIII", mvhd_data[:20])
                     elif version == 1 and len(mvhd_data) >= 32:
-                        _, creation_time, _, time_scale, duration = struct.unpack(">BQQ I Q", mvhd_data[:29])
+                        _, _, creation_time, _, time_scale, duration = struct.unpack(">B3sQQIQ", mvhd_data[:32])
                     else:
                         break
 
@@ -282,3 +326,40 @@ class MetadataExtractor:
                 except ValueError:
                     continue
         return None
+
+
+# ponytail: batched screenshot re-check — the "screenshot" substring stays primary (free).
+# Jev judges only non-camera-pattern PHOTO names, one call per scan. Empty = keep PHOTO.
+_SCREENSHOT_NOUL_THRESHOLD = 0.75
+_SCREENSHOT_BATCH_CAP = 200
+_CAMERA_PATTERN = re.compile(r"^(IMG|VID|PXL|DSCN?|SAM_)", re.IGNORECASE)
+
+
+def judge_screenshots(filenames: list, _ask=None) -> set:
+    """Return the subset of filenames judged to be screen captures in any language."""
+    import os
+
+    cands = [f for f in filenames if not _CAMERA_PATTERN.match(Path(f).stem)][: _SCREENSHOT_BATCH_CAP]
+    if not cands or not os.environ.get("TYPESAFE_API_KEY"):
+        return set()
+    try:
+        questions = {
+            f"f{i}": {
+                "type": "noul",
+                "instructions": f"Is the file `{fn}` a screen capture (screenshot) in any language, "
+                    "rather than a camera photo or other image?",
+            }
+            for i, fn in enumerate(cands)
+        }
+        if _ask is None:
+            from typesafe_sdk import TypeSafeClient
+
+            def _ask(state, questions):
+                with TypeSafeClient(timeout=15.0) as client:
+                    resp = client.system_one(state=state, questions=questions)
+                return {qid: resp.nouls[qid].noul for qid in questions}
+
+        probs = _ask({"files": cands}, questions)
+        return {fn for i, fn in enumerate(cands) if (probs.get(f"f{i}") or 0) > _SCREENSHOT_NOUL_THRESHOLD}
+    except Exception:
+        return set()

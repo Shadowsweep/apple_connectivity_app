@@ -38,3 +38,54 @@ export function useTriggerRebuild() {
     },
   });
 }
+
+export function useSetLibraryPath() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (path: string) => libraryApi.setLibraryPath(path),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: ['health'] });
+    },
+  });
+}
+
+export function useVaultFolders() {
+  return useQuery({
+    queryKey: ['vaultFolders'],
+    queryFn: () => libraryApi.getVaultFolders(),
+    staleTime: 5000,
+  });
+}
+
+export function useCreateVaultFolder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ name, parent = '' }: { name: string; parent?: string }) =>
+      libraryApi.createVaultFolder(name, parent),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vaultFolders'] });
+    },
+  });
+}
+
+export function useMoveMediaToVaultFolder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      mediaIds,
+      targetFolder = '',
+      copyMedia = false,
+    }: {
+      mediaIds: string[];
+      targetFolder?: string;
+      copyMedia?: boolean;
+    }) => libraryApi.moveMediaToVaultFolder(mediaIds, targetFolder, copyMedia),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['vaultFolders'] });
+    },
+  });
+}

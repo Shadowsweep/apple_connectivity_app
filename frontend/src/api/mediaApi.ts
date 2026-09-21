@@ -30,4 +30,17 @@ export const mediaApi = {
   removeFavorite: async (mediaId: string): Promise<{ status: string; media_id: string }> => {
     return request('/media/' + mediaId + '/favorite', { method: 'DELETE' });
   },
+
+  trashMedia: async (
+    mediaIds: string[],
+  ): Promise<{ trashed_count: number; trashed_ids: string[] }> => {
+    return request('/media/trash', {
+      method: 'POST',
+      body: JSON.stringify({ media_ids: mediaIds }),
+    });
+  },
+
+  backfillDurations: async (): Promise<{ scanned: number; updated: number; failed: number }> => {
+    return request('/media/backfill-durations', { method: 'POST' });
+  },
 };

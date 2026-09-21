@@ -24,7 +24,8 @@ from app.storage.manager import StorageManager
 
 class MemeEasyCLI:
     def __init__(self, default_library: Optional[Path] = None):
-        base_dir = Path(__file__).resolve().parent
+        # ponytail: frozen exe must not use the PyInstaller temp extraction dir
+        base_dir = Path.home() / "MEMEASY" if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
         self.default_library_path = default_library or (base_dir / "Library")
         self.storage_manager = StorageManager(self.default_library_path)
         self.db = DatabaseConnection(self.storage_manager.library_root / ".memeasy" / "library.db")
@@ -171,7 +172,7 @@ class MemeEasyCLI:
         print("\n========================================")
         print("             IMPORT PREVIEW             ")
         print("========================================")
-        preview = self.importer.preview(self.filtered_items)
+        preview = self.importer.preview(self.filtered_items, device=self.active_device)
         print(f"Photos           : {preview.photos_count}")
         print(f"Videos           : {preview.videos_count}")
         print(f"Screenshots      : {preview.screenshots_count}")
@@ -194,7 +195,7 @@ class MemeEasyCLI:
             print("\n[!] No items scanned. Scanning device first...")
             self.action_scan_device()
 
-        preview = self.importer.preview(self.filtered_items)
+        preview = self.importer.preview(self.filtered_items, device=self.active_device)
         if preview.new_items_count == 0:
             print("\n[i] All items are already imported. Nothing to copy.\n")
             return
@@ -327,6 +328,12 @@ def main():
 
     args = parser.parse_args()
 
+    # ponytail: frozen exe double-click = launch the app UI, dev CLI keeps the menu
+    if not args.command and getattr(sys, "frozen", False):
+        args.command = "serve"
+        args.host = "127.0.0.1"
+        args.port = 8000
+
     lib_path = Path(args.library) if getattr(args, "library", None) else None
     cli = MemeEasyCLI(default_library=lib_path)
     if args.mock_device:
@@ -346,11 +353,32 @@ def main():
         for r in results:
             print(f"[{r.media_type}] {r.filename} -> {r.relative_path} ({StorageManager.format_bytes(r.size_bytes)})")
     elif args.command == "serve":
+        import socket
+        import threading
         import uvicorn
+        import webbrowser
         from app.api.main import create_app
-        app = create_app(cli.storage_manager.library_root)
-        print(f"[*] Starting MEMEASY API server on http://{args.host}:{args.port}")
-        uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+
+        def free_port(preferred: int) -> int:
+            s = socket.socket()
+            try:
+                s.bind((args.host, preferred))
+                port = s.getsockname()[1]
+            except OSError:
+                s.close()
+                s = socket.socket()
+                s.bind((args.host, 0))
+                port = s.getsockname()[1]
+            s.close()
+            return port
+
+        port = free_port(args.port)
+        # None = let init_app_context resolve saved settings / default vault
+        app = create_app(cli.storage_manager.library_root if args.library else None)
+        url = f"http://{args.host}:{port}"
+        print(f"[*] Starting MEMEASY on {url} (close this window to quit)")
+        threading.Timer(1.5, webbrowser.open, args=(url,)).start()
+        uvicorn.run(app, host=args.host, port=port, log_level="info")
     else:
         cli.run_menu()
 

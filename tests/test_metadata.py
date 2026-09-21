@@ -51,7 +51,8 @@ def test_filename_fallback_and_screenshot(mock_iphone_dir: Path):
     assert item.capture_date_source == "FILENAME"
 
 
-def test_live_photo_pairing(mock_iphone_dir: Path):
+def test_live_photo_pairing(mock_iphone_dir: Path, monkeypatch):
+    monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
     device = MockIPhoneDevice(mock_iphone_dir)
     scanner = MediaScanner(device)
     items = scanner.scan()
@@ -59,3 +60,36 @@ def test_live_photo_pairing(mock_iphone_dir: Path):
 
     assert item_map["IMG_1003.JPG"].media_type == MediaType.LIVE_PHOTO
     assert item_map["IMG_1003.MOV"].media_type == MediaType.LIVE_PHOTO
+
+
+def test_judge_screenshots_batch(monkeypatch, tmp_path: Path):
+    from app.scanner.metadata import judge_screenshots
+
+    monkeypatch.setenv("TYPESAFE_API_KEY", "test-key")
+    ask = lambda state, questions: {"f0": 0.98, "f1": 0.12}  # noqa: E731
+    hits = judge_screenshots(["Bildschirmfoto 2026-01-05.png", "birthday-cake.jpg"], _ask=ask)
+    assert hits == {"Bildschirmfoto 2026-01-05.png"}
+    # camera-pattern names never even reach the judge
+    seen = {}
+    spy = lambda state, questions: seen.update(questions) or {}  # noqa: E731
+    assert judge_screenshots(["IMG_1001.HEIC"], _ask=spy) == set()
+    assert seen == {}
+    # offline / error = keep PHOTO
+    monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
+    assert judge_screenshots(["Bildschirmfoto 2026-01-05.png"], _ask=ask) == set()
+
+
+def test_scan_flips_localized_screenshot(monkeypatch, tmp_path: Path):
+    from app.scanner import scanner as scanner_mod
+
+    monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
+    shot = tmp_path / "Bildschirmfoto 2026-01-05.png"
+    shot.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 100)
+    photo = tmp_path / "IMG_9999.HEIC"
+    photo.write_bytes(b"\x00" * 100)
+    device = MockIPhoneDevice(tmp_path)
+    monkeypatch.setattr(scanner_mod, "judge_screenshots", lambda names, _ask=None: set(names) - {"IMG_9999.HEIC"})
+    items = MediaScanner(device).scan()
+    item_map = {it.filename: it for it in items}
+    assert item_map["Bildschirmfoto 2026-01-05.png"].media_type == MediaType.SCREENSHOT
+    assert item_map["IMG_9999.HEIC"].media_type == MediaType.PHOTO
